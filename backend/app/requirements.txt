@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+pydantic
+snowflake-connector-python
+python-dotenv
+bcrypt
+pydantic[email]
+python-jose

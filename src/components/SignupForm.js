@@ -1,6 +1,8 @@
 import React, { useState } from "react";
+import axios from "axios";
+import "./SignupForm.css"; // Importar el CSS
 
-function SignupForm({ onSignup }) {
+function SignupForm() {
   const [nom, setNom] = useState("");
   const [prenom, setPrenom] = useState("");
   const [email, setEmail] = useState("");
@@ -9,79 +11,132 @@ function SignupForm({ onSignup }) {
   const [rol, setRol] = useState("");
   const [plan, setPlan] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (password === confirmPassword) {
-      onSignup({ nom, prenom, email, rol, plan, password });
-    } else {
-      alert("Las contraseñas no coinciden");
+
+    // Validar contraseñas
+    if (password !== confirmPassword) {
+      alert("Les mots de passe ne correspondent pas");
+      return;
+    }
+
+    // Convertir el rol y plan en IDs
+    const profil_id = rol === "Candidat" ? 2 : rol === "Recruteur" ? 1 : null;
+    const plan_id =
+      plan === "Basique"
+        ? 1
+        : plan === "Pro"
+        ? 2
+        : plan === "Enterprise"
+        ? 3
+        : null;
+
+    if (!profil_id || !plan_id) {
+      alert("Sélectionnez un rôle et un plan valides");
+      return;
+    }
+
+    try {
+      // Enviar datos al backend
+      const response = await axios.post("http://127.0.0.1:8000/utilisateurs", {
+        nom,
+        prenom,
+        email,
+        mot_de_passe: password,
+        profil_id,
+        plan_id,
+      });
+
+      // Mostrar éxito
+      alert("Utilisateur enregistré avec succès");
+      console.log("Réponse du serveur:", response.data);
+
+      // Limpiar el formulario
+      setNom("");
+      setPrenom("");
+      setEmail("");
+      setPassword("");
+      setConfirmPassword("");
+      setRol("");
+      setPlan("");
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.detail || "Erreur lors de l'enregistrement";
+
+      if (errorMessage === "L'email est déjà enregistré") {
+        alert("Cet email est déjà utilisé. Veuillez en utiliser un autre.");
+      } else {
+        alert(errorMessage);
+      }
+
+      console.error("Erreur d'enregistrement:", errorMessage);
     }
   };
 
   // Opciones de plan según el rol seleccionado
   const getPlanOptions = () => {
     if (rol === "Candidat") {
-      return ["Básico", "Pro"];
+      return ["Basique", "Pro"];
     } else if (rol === "Recruteur") {
-      return ["Básico", "Enterprise"];
+      return ["Basique", "Enterprise"];
     }
     return [];
   };
 
   return (
-    <div style={containerStyle}>
-      <h2 style={titleStyle}>Inscrire</h2>
-      <form onSubmit={handleSubmit} style={formStyle}>
-        <div style={fieldStyle}>
+    <div className="container">
+      <h2 className="title">Inscrire</h2>
+      <form onSubmit={handleSubmit} className="form">
+        <div className="field">
           <label>Nom:</label>
           <input
             type="text"
             value={nom}
             onChange={(e) => setNom(e.target.value)}
             required
-            style={inputStyle}
+            className="input"
           />
         </div>
-        <div style={fieldStyle}>
+        <div className="field">
           <label>Prénom:</label>
           <input
             type="text"
             value={prenom}
             onChange={(e) => setPrenom(e.target.value)}
             required
-            style={inputStyle}
+            className="input"
           />
         </div>
-        <div style={fieldStyle}>
+        <div className="field">
           <label>Email:</label>
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            style={inputStyle}
+            className="input"
           />
         </div>
-        <div style={fieldStyle}>
+        <div className="field">
           <label>Rôle:</label>
           <select
             value={rol}
             onChange={(e) => setRol(e.target.value)}
             required
-            style={inputStyle}
+            className="input"
           >
             <option value="">Sélectionnez un Rôle</option>
             <option value="Candidat">Candidat</option>
             <option value="Recruteur">Recruteur</option>
           </select>
         </div>
-        <div style={fieldStyle}>
+        <div className="field">
           <label>Type de Plan:</label>
           <select
             value={plan}
             onChange={(e) => setPlan(e.target.value)}
             required
-            style={inputStyle}
+            className="input"
           >
             <option value="">Sélectionner un Plan</option>
             {getPlanOptions().map((option) => (
@@ -91,79 +146,32 @@ function SignupForm({ onSignup }) {
             ))}
           </select>
         </div>
-        <div style={fieldStyle}>
+        <div className="field">
           <label>Mot de Passe:</label>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            style={inputStyle}
+            className="input"
           />
         </div>
-        <div style={fieldStyle}>
+        <div className="field">
           <label>Confirmer le mot de passe:</label>
           <input
             type="password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
-            style={inputStyle}
+            className="input"
           />
         </div>
-        <button type="submit" style={buttonStyle}>
+        <button type="submit" className="button">
           S'enregistrer
         </button>
       </form>
     </div>
   );
 }
-
-// Estilos básicos para el formulario
-const containerStyle = {
-  maxWidth: "500px",
-  margin: "auto",
-  padding: "20px",
-  borderRadius: "8px",
-  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-  backgroundColor: "#f9f9f9",
-};
-
-const titleStyle = {
-  textAlign: "center",
-  color: "#333",
-  fontSize: "1.8em",
-  marginBottom: "20px",
-};
-
-const formStyle = {
-  display: "flex",
-  flexDirection: "column",
-};
-
-const fieldStyle = {
-  display: "flex",
-  flexDirection: "column",
-  marginBottom: "15px",
-};
-
-const inputStyle = {
-  padding: "10px",
-  fontSize: "1em",
-  borderRadius: "4px",
-  border: "1px solid #ccc",
-  marginTop: "5px",
-};
-
-const buttonStyle = {
-  padding: "10px",
-  fontSize: "1em",
-  borderRadius: "4px",
-  border: "none",
-  backgroundColor: "#333",
-  color: "#fff",
-  cursor: "pointer",
-  marginTop: "20px",
-};
 
 export default SignupForm;

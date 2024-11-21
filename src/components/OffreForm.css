@@ -1,0 +1,61 @@
+.offre-container {
+  max-width: 600px;
+  margin: auto;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #fdf6f0;
+  font-family: Arial, sans-serif;
+}
+
+.offre-title {
+  text-align: center;
+  color: #663300;
+  font-size: 1.8em;
+  margin-bottom: 20px;
+}
+
+.offre-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.offre-field {
+  margin-bottom: 15px;
+}
+
+.offre-field label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: block;
+  color: #663300;
+}
+
+.offre-input,
+.offre-textarea {
+  width: 100%;
+  padding: 10px;
+  font-size: 1em;
+  border-radius: 4px;
+  border: 1px solid #663300;
+  margin-top: 5px;
+}
+
+.offre-textarea {
+  height: 100px;
+}
+
+.offre-button {
+  padding: 10px;
+  font-size: 1em;
+  border-radius: 4px;
+  border: none;
+  background-color: #663300;
+  color: #fff;
+  cursor: pointer;
+  text-align: center;
+}
+
+.offre-button:hover {
+  background-color: #995c33;
+}

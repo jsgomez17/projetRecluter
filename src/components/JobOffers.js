@@ -35,7 +35,7 @@ function JobOffers({ profil_id, user_id }) {
 
   // Manejo de clic para crear oferta
   const handleCreateOffer = () => {
-    navigate("/offre-form"); // Navegar al formulario de creación de oferta
+    navigate("/offre-form", { state: { user_id } }); // Navegar al formulario de creación de oferta
   };
 
   return (

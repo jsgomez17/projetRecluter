@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from app.database import get_snowflake_connection
 from datetime import date
 from typing import List
-from app.schemas.offers import OfferResponse
+from app.schemas.offers import OfferResponse, OfferCreate
+from app.utils.auth import get_current_user
 
 router = APIRouter()
 
@@ -49,5 +50,65 @@ def get_offers(profil_id: int, user_id: int):
             }
             for row in results
         ]
+    finally:
+        conn.close()
+
+@router.post("/", response_model=OfferResponse)
+def create_offer(offer: OfferCreate):
+    conn = get_snowflake_connection()
+    try:
+        cursor = conn.cursor()
+        
+        # Consulta para insertar una nueva oferta (sin RETURNING)
+        insert_query = """
+        INSERT INTO offres (nom_offert, nom_entreprise, adresse_entreprise, type_poste, salaire, description, date_debut, date_fin, recruteur_id, date_creation)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        cursor.execute(
+            insert_query,
+            (
+                offer.nom_offert,
+                offer.nom_entreprise,
+                offer.adresse_entreprise,
+                offer.type_poste,
+                offer.salaire,
+                offer.description,
+                offer.date_debut,
+                offer.date_fin,
+                offer.recruteur_id,
+                date.today(),  # Fecha de creación
+            ),
+        )
+        
+        # Consulta para obtener la oferta creada basándose en los campos únicos
+        select_query = """
+        SELECT id, nom_offert, nom_entreprise, adresse_entreprise, type_poste, salaire, description, date_debut, date_fin, recruteur_id, date_creation
+        FROM offres
+        WHERE nom_offert = %s AND recruteur_id = %s AND date_creation = %s
+        ORDER BY id DESC LIMIT 1
+        """
+        cursor.execute(
+            select_query,
+            (offer.nom_offert, offer.recruteur_id, date.today()),
+        )
+        result = cursor.fetchone()
+
+        if not result:
+            raise HTTPException(status_code=400, detail="Erreur lors de la création de l'offre")
+
+        # Devolver la oferta creada
+        return OfferResponse(
+            id=result[0],
+            nom_offert=result[1],
+            nom_entreprise=result[2],
+            adresse_entreprise=result[3],
+            type_poste=result[4],
+            salaire=result[5],
+            description=result[6],
+            date_debut=result[7],
+            date_fin=result[8],
+            recruteur_id=result[9],
+            date_creation=result[10],
+        )
     finally:
         conn.close()

@@ -24,11 +24,11 @@ def create_access_token(data: dict):
     to_encode.update({"exp": expire})  # Se añade la fecha de expiración al token
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
-
 # Función para verificar y decodificar un token
 def verify_access_token(token: str):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        print("Token decodificado correctamente:", payload)  # Depuración
         return payload  # Devuelve los datos decodificados del token
     except JWTError:
         return None

@@ -18,6 +18,8 @@ function App() {
   const handleLogin = (userData) => {
     setIsAuthenticated(true);
     setUser(userData);
+    // Almacena el token en el localStorage
+    localStorage.setItem("authToken", userData.token);
     navigate("/offers"); // Redirigir siempre a la página de ofertas después del login
   };
 

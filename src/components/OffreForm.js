@@ -1,7 +1,12 @@
 import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
+import axios from "axios";
 import "./OffreForm.css";
 
-function OffreForm({ onSubmit }) {
+function OffreForm() {
+  const location = useLocation();
+  const user_id = location.state?.user_id; // Obtén el user_id desde la ubicación
+
   const [nomOffert, setNomOffert] = useState("");
   const [nomEntreprise, setNomEntreprise] = useState("");
   const [adresseEntreprise, setAdresseEntreprise] = useState("");
@@ -11,30 +16,56 @@ function OffreForm({ onSubmit }) {
   const [dateDebut, setDateDebut] = useState("");
   const [dateFin, setDateFin] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validar que todos los campos estén completos
     if (
-      nomOffert &&
-      nomEntreprise &&
-      adresseEntreprise &&
-      typePoste &&
-      salaire &&
-      description &&
-      dateDebut &&
-      dateFin
+      !nomOffert ||
+      !nomEntreprise ||
+      !adresseEntreprise ||
+      !typePoste ||
+      !salaire ||
+      !description ||
+      !dateDebut ||
+      !dateFin
     ) {
-      onSubmit({
-        nomOffert,
-        nomEntreprise,
-        adresseEntreprise,
-        typePoste,
-        salaire,
-        description,
-        dateDebut,
-        dateFin,
-      });
-    } else {
       alert("Tous les champs sont obligatoires.");
+      return;
+    }
+
+    try {
+      // Realizar solicitud POST al backend
+      const response = await axios.post("http://127.0.0.1:8000/offers", {
+        nom_offert: nomOffert,
+        nom_entreprise: nomEntreprise,
+        adresse_entreprise: adresseEntreprise,
+        type_poste: typePoste,
+        salaire: parseFloat(salaire),
+        description,
+        date_debut: dateDebut,
+        date_fin: dateFin,
+        recruteur_id: user_id,
+      });
+
+      alert("Offre créée avec succès!");
+      console.log("Réponse du serveur:", response.data);
+
+      // Limpiar el formulario después de una creación exitosa
+      setNomOffert("");
+      setNomEntreprise("");
+      setAdresseEntreprise("");
+      setTypePoste("");
+      setSalaire("");
+      setDescription("");
+      setDateDebut("");
+      setDateFin("");
+    } catch (error) {
+      console.error(
+        "Erreur lors de la création de l'offre:",
+        error.response?.data || error.message
+      );
+      alert("Erreur lors de la création de l'offre.");
     }
   };
 

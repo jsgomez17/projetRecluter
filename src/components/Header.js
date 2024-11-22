@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-function Header() {
+function Header({ isAuthenticated, onLogout }) {
   return (
     <header style={headerStyle}>
       <div style={{ display: "flex", alignItems: "center" }}>
@@ -18,12 +18,25 @@ function Header() {
         <Link to="/" style={linkStyle}>
           Accueil
         </Link>
-        <Link to="/login" style={linkStyle}>
-          Login
-        </Link>
-        <Link to="/signup" style={linkStyle}>
-          Inscrire
-        </Link>
+        {isAuthenticated ? (
+          <>
+            <Link to="/offers" style={linkStyle}>
+              Offres d'emploi
+            </Link>
+            <button onClick={onLogout} style={buttonStyle}>
+              Déconnexion
+            </button>
+          </>
+        ) : (
+          <>
+            <Link to="/login" style={linkStyle}>
+              Login
+            </Link>
+            <Link to="/signup" style={linkStyle}>
+              Inscrire
+            </Link>
+          </>
+        )}
       </nav>
     </header>
   );
@@ -55,6 +68,16 @@ const linkStyle = {
   margin: "0 10px",
   padding: "8px 15px",
   borderRadius: "4px",
+  transition: "background-color 0.3s ease",
+};
+
+const buttonStyle = {
+  backgroundColor: "#ff4d4f",
+  color: "#fff",
+  border: "none",
+  padding: "8px 15px",
+  borderRadius: "4px",
+  cursor: "pointer",
   transition: "background-color 0.3s ease",
 };
 

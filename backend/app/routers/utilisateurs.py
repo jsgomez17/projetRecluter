@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
 from app.database import get_snowflake_connection
-from app.schemas.utilisateur import UtilisateurCreate, UtilisateurResponse
+from app.schemas.utilisateur import UtilisateurCreate, UtilisateurResponse, LoginRequest
 from app.utils.security import hash_password, verify_password
 from app.utils.security import create_access_token, verify_access_token
 from app.utils.auth import get_current_user
@@ -122,9 +122,13 @@ def get_utilisateur(user_id: int):
 
 #validación para el login
 @router.post("/login")
-def login(email: str, mot_de_passe: str):
+def login(login_request: LoginRequest):
     conn = get_snowflake_connection()
     try:
+        # Extraer datos del cuerpo de la solicitud
+        email = login_request.email
+        mot_de_passe = login_request.mot_de_passe
+
         cursor = conn.cursor()
         query = "SELECT id, nom, prenom, email, mot_de_passe, profil_id, plan_id FROM utilisateurs WHERE email = %s;"
         cursor.execute(query, (email,))
@@ -139,7 +143,7 @@ def login(email: str, mot_de_passe: str):
         if not verify_password(mot_de_passe, hashed_password):
             raise HTTPException(status_code=401, detail="Mot de passe incorrect")
 
-    # Crear el token incluyendo PROFIL_ID y PLAN_ID
+        # Crear el token
         access_token = create_access_token(
             data={
                 "user_id": user_id,
@@ -162,6 +166,7 @@ def login(email: str, mot_de_passe: str):
         }
     finally:
         conn.close()
+
 
 @router.get("/dashboard")
 def dashboard(current_user: dict = Depends(get_current_user)):

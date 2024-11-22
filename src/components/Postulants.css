@@ -1,0 +1,45 @@
+.postulants-container {
+  max-width: 800px;
+  margin: auto;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #f9f9f9;
+  font-family: Arial, sans-serif;
+}
+
+.postulants-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.postulants-table th,
+.postulants-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.postulants-table th {
+  background-color: #333;
+  color: white;
+  font-weight: bold;
+}
+
+.postulants-table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.postulants-table tr:hover {
+  background-color: #ddd;
+}
+
+a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}

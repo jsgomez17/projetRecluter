@@ -1,19 +1,38 @@
-// src/components/LoginForm.js
 import React, { useState } from "react";
+import axios from "axios";
 
 function LoginForm({ onLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    onLogin({ email, password });
+
+    try {
+      // Enviar datos al backend
+      const response = await axios.post(
+        "http://127.0.0.1:8000/utilisateurs/login",
+        {
+          email,
+          mot_de_passe: password,
+        }
+      );
+
+      const { user } = response.data;
+      onLogin(user); // Pasar los datos del usuario al estado global en App.js
+    } catch (error) {
+      console.error(
+        "Erreur lors de la connexion:",
+        error.response?.data || error.message
+      );
+      alert("Email ou mot de passe incorrect");
+    }
   };
 
   return (
     <div style={containerStyle}>
       <h2 style={titleStyle}>Login</h2>
-      <form onSubmit={handleSubmit} style={formStyle}>
+      <form onSubmit={handleLogin} style={formStyle}>
         <div style={fieldStyle}>
           <label>Email:</label>
           <input

@@ -23,3 +23,7 @@ class UtilisateurResponse(BaseModel):
 
     class Config:
         orm_mode = True
+        
+class LoginRequest(BaseModel):
+    email: str
+    mot_de_passe: str

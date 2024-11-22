@@ -1,0 +1,63 @@
+.offre-container {
+  max-width: 600px;
+  margin: auto;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #f9f9f9;
+  font-family: Arial, sans-serif;
+}
+
+.offre-title {
+  text-align: center;
+  color: #333;
+  font-size: 1.8em;
+  margin-bottom: 20px;
+}
+
+.offre-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.offre-field {
+  margin-bottom: 15px;
+}
+
+.offre-field label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: block;
+  color: #333;
+}
+
+.offre-input,
+.offre-textarea,
+.offre-button,
+select {
+  /* Incluir el botón y el select */
+  width: 100%;
+  padding: 10px;
+  font-size: 1em;
+  border-radius: 4px;
+  border: 1px solid #333;
+  margin-top: 5px;
+  box-sizing: border-box; /* Asegurar que el padding no afecte el ancho */
+}
+
+.offre-textarea {
+  height: 100px;
+  resize: none; /* Evita que el usuario cambie el tamaño manualmente */
+}
+
+.offre-button {
+  background-color: #333;
+  color: #fff;
+  cursor: pointer;
+  text-align: center;
+  border: none;
+}
+
+.offre-button:hover {
+  background-color: #555;
+}

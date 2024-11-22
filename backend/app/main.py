@@ -1,10 +1,11 @@
 from fastapi import FastAPI
-from app.routers import utilisateurs
+from app.routers import utilisateurs, offers
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
 app.include_router(utilisateurs.router, prefix="/utilisateurs", tags=["Utilisateurs"])
+app.include_router(offers.router, prefix="/offers", tags=["Offers"])
 
 @app.get("/")
 def read_root():

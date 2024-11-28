@@ -1,11 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import useCheckCV from "../hooks/useCheckCV";
 import axios from "axios";
 import "./JobOffers.css"; // Asegúrate de que el CSS actualizado esté importado
 
 function JobOffers({ profil_id, user_id }) {
+  const { hasCV, loading, error } = useCheckCV(user_id);
   const [offers, setOffers] = useState([]);
   const navigate = useNavigate(); // Hook para la navegación
+
+  // Redirigir al candidato si no tiene CV cargado
+  useEffect(() => {
+    if (loading) return; // Esperar a que termine la verificación
+    if (profil_id === 2 && hasCV === false) {
+      navigate("/upload-cv", { state: { utilisateur_id: user_id } }); // Redirigir a la página de carga de CV
+    }
+  }, [hasCV, loading, profil_id, navigate, user_id]);
 
   useEffect(() => {
     // Cargar las ofertas desde el backend
@@ -19,9 +29,10 @@ function JobOffers({ profil_id, user_id }) {
         console.error("Error al cargar las ofertas:", error);
       }
     };
-
-    fetchOffers();
-  }, [profil_id, user_id]);
+    if (hasCV || profil_id === 1) {
+      fetchOffers(); // Cargar ofertas solo si tiene CV o es reclutador
+    }
+  }, [profil_id, user_id, hasCV]);
 
   // Manejo de clic para postular
   const handlePostuler = (offerId) => {
@@ -38,6 +49,13 @@ function JobOffers({ profil_id, user_id }) {
     navigate("/offre-form", { state: { user_id } }); // Navegar al formulario de creación de oferta
   };
 
+  if (loading) {
+    return <p>Cargando...</p>;
+  }
+
+  if (error) {
+    return <p>Error al verificar el CV: {error.message}</p>;
+  }
   return (
     <div className="job-offers-container">
       <h2>Offres d'emploi</h2>

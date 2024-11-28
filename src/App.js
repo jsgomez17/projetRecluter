@@ -6,7 +6,7 @@ import Footer from "./components/Footer";
 import SignupForm from "./components/SignupForm";
 import JobOffers from "./components/JobOffers"; // Nuevo componente de ofertas
 import Accueil from "./components/Accueil";
-import PostulerForm from "./components/PostulerForm";
+import TeleverserCVForm from "./components/TeleverserCVForm";
 import Postulants from "./components/Postulants";
 import OffreForm from "./components/OffreForm";
 
@@ -47,7 +47,7 @@ function App() {
               )
             }
           />
-          <Route path="/postuler-form/:id" element={<PostulerForm />} />
+          <Route path="/upload-cv" element={<TeleverserCVForm />} />
           <Route path="/offre-form" element={<OffreForm />} />
           <Route path="/postulants/:offerId" element={<Postulants />} />{" "}
           {/* Nueva ruta */}

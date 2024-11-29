@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-function Header({ isAuthenticated, onLogout }) {
+function Header({ isAuthenticated, onLogout, profil_id }) {
   return (
     <header style={headerStyle}>
       <div style={{ display: "flex", alignItems: "center" }}>
@@ -23,6 +23,11 @@ function Header({ isAuthenticated, onLogout }) {
             <Link to="/offers" style={linkStyle}>
               Offres d'emploi
             </Link>
+            {isAuthenticated && profil_id === 2 && (
+              <Link to="/applications" style={linkStyle}>
+                Mes Candidatures
+              </Link>
+            )}
             <button onClick={onLogout} style={buttonStyle}>
               Déconnexion
             </button>

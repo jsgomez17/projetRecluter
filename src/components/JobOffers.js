@@ -65,7 +65,9 @@ function JobOffers({ profil_id, user_id, plan_id }) {
 
   // Manejo de clic para postular
   const handlePostuler = (offerId) => {
-    navigate(`/postuler-form/${offerId}`); // Navegar al formulario de postulación con el ID de la oferta
+    navigate(`/postuler-form/${offerId}`, {
+      state: { candidat_id: user_id, offre_id: offerId, plan_id: plan_id },
+    });
   };
 
   // Manejo de clic para ver postulantes

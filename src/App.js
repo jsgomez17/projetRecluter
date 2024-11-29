@@ -10,6 +10,7 @@ import TeleverserCVForm from "./components/TeleverserCVForm";
 import Postulants from "./components/Postulants";
 import OffreForm from "./components/OffreForm";
 import PostulerForm from "./components/PostulerForm";
+import MyApplications from "./components/MyApplications";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false); // Estado para autenticación
@@ -35,7 +36,11 @@ function App() {
 
   return (
     <div>
-      <Header isAuthenticated={isAuthenticated} onLogout={handleLogout} />
+      <Header
+        isAuthenticated={isAuthenticated}
+        onLogout={handleLogout}
+        profil_id={user?.profil_id}
+      />
       <main style={{ padding: "20px" }}>
         <Routes>
           <Route path="/" element={<Accueil />} />
@@ -66,6 +71,16 @@ function App() {
                 />
               ) : (
                 <p>Veuillez vous connecter pour postuler.</p>
+              )
+            }
+          />
+          <Route
+            path="/applications"
+            element={
+              isAuthenticated ? (
+                <MyApplications user_id={user?.id} />
+              ) : (
+                <p>Veuillez vous connecter pour voir vos applications.</p>
               )
             }
           />

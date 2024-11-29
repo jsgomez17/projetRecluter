@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routers import utilisateurs, offers, cvs
+from app.routers import utilisateurs, offers, cvs, postulats
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -7,6 +7,7 @@ app = FastAPI()
 app.include_router(utilisateurs.router, prefix="/utilisateurs", tags=["Utilisateurs"])
 app.include_router(offers.router, prefix="/offers", tags=["Offers"])
 app.include_router(cvs.router, prefix="/cvs", tags=["CVs"])
+app.include_router(postulats.router, prefix="/postulats",tags=["Postulats"])
 
 @app.get("/")
 def read_root():

@@ -1,0 +1,25 @@
+.my-applications-container {
+  padding: 20px;
+}
+
+.my-applications-container h2 {
+  text-align: center;
+}
+
+.applications-grid {
+  display: grid; /* Activa el grid layout */
+  grid-template-columns: repeat(
+    3,
+    1fr
+  ); /* Define 3 columnas del mismo tamaño */
+  gap: 20px; /* Espaciado entre los elementos */
+  padding: 10px; /* Espaciado interno del contenedor */
+}
+
+.application-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}

@@ -1,13 +1,21 @@
 import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./PostulerForm.css"; // Opcional, para estilos personalizados.
 
-function PostulerForm({ user_id, user_plan }) {
+function PostulerForm() {
   const [letter, setLetter] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const location = useLocation();
-  const offerId = location.state?.offerId || null;
+  const navigate = useNavigate();
+  const { candidat_id, offre_id, plan_id } = location.state || {};
+
+  // Validar si `offerId` y `user_id` existen
+  if (!offre_id || !candidat_id) {
+    console.error("Offer ID o User ID no proporcionado.");
+    navigate("/offers"); // Redirigir a las ofertas si falta información
+    return null;
+  }
 
   const handlePostuler = async () => {
     if (!letter.trim()) {
@@ -18,20 +26,25 @@ function PostulerForm({ user_id, user_plan }) {
     setIsLoading(true);
     try {
       // Lógica para enviar la carta al backend
-      await axios.post("http://127.0.0.1:8000/apply", {
-        utilisateur_id: user_id,
-        offre_id: offerId,
+      await axios.post("http://127.0.0.1:8000/postulats/postuler", {
+        candidat_id: candidat_id,
+        offre_id: offre_id,
         lettre: letter,
       });
       alert("Postulé avec succès !");
+      navigate("/offers");
     } catch (error) {
       console.error("Erreur lors de la postulation :", error);
-      alert("Erreur lors de la postulation.");
+      alert(
+        error.response?.data?.detail ||
+          "Une erreur est survenue. Veuillez réessayer."
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Función para generar carta con IA
   const handleGenerateLetter = async () => {
     setIsLoading(true);
     try {
@@ -39,8 +52,8 @@ function PostulerForm({ user_id, user_plan }) {
       const response = await axios.post(
         "http://127.0.0.1:8000/generate-letter",
         {
-          utilisateur_id: user_id,
-          offre_id: offerId,
+          utilisateur_id: candidat_id,
+          offre_id: offre_id,
         }
       );
       setLetter(response.data.generated_letter); // Establecer la carta generada
@@ -74,7 +87,7 @@ function PostulerForm({ user_id, user_plan }) {
           >
             {isLoading ? "En cours..." : "Postuler"}
           </button>
-          {user_plan === 2 && (
+          {plan_id === 2 && (
             <button
               type="button"
               onClick={handleGenerateLetter}

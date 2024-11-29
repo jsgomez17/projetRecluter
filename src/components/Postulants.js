@@ -17,7 +17,7 @@ function Postulants() {
         );
         setPostulants(response.data);
       } catch (err) {
-        console.error("Error al cargar los postulantes:", err);
+        console.error("Erreur lors du chargement des candidats:", err);
         setError(
           "Une erreur s'est produite lors du chargement des postulants."
         );

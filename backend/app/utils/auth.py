@@ -7,7 +7,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
 
 # Función para validar el token y devolver los datos del usuario
 def get_current_user(token: str = Depends(oauth2_scheme)):
-    print("Token recibido:", token)
+    print("Token reçu:", token)
     payload = verify_access_token(token)
     if not payload:
         raise HTTPException(status_code=401, detail="Token invalide ou expiré")

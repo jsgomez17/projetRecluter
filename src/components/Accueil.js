@@ -1,4 +1,3 @@
-// src/components/Accueil.js
 import React from "react";
 
 function Accueil() {

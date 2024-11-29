@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useCheckCV from "../hooks/useCheckCV";
 import axios from "axios";
+import Chatbot from "./Chatbot";
 import "./JobOffers.css";
 
-function JobOffers({ profil_id, user_id }) {
+function JobOffers({ profil_id, user_id, plan_id }) {
   const { hasCV, loading, error } = useCheckCV(user_id);
   const [activeTab, setActiveTab] = useState("all"); // Controla la pestaña activa
   const [offers, setOffers] = useState([]);
@@ -28,7 +29,7 @@ function JobOffers({ profil_id, user_id }) {
         });
         setOffers(response.data);
       } catch (error) {
-        console.error("Error al cargar las ofertas:", error);
+        console.error("Erreur lors du chargement des offres:", error);
       }
     };
     if (hasCV || profil_id === 1) {
@@ -46,7 +47,10 @@ function JobOffers({ profil_id, user_id }) {
         );
         setRecommendedOffers(response.data);
       } catch (error) {
-        console.error("Error al cargar las ofertas recomendadas:", error);
+        console.error(
+          "Erreur lors du chargement des offres recommandées:",
+          error
+        );
       }
     };
     if (profil_id === 2) {
@@ -75,11 +79,11 @@ function JobOffers({ profil_id, user_id }) {
   };
 
   if (loading) {
-    return <p>Cargando...</p>;
+    return <p>Chargement...</p>;
   }
 
   if (error) {
-    return <p>Error al verificar el CV: {error.message}</p>;
+    return <p>Erreur lors de la vérification du CV: {error.message}</p>;
   }
 
   return (
@@ -246,6 +250,8 @@ function JobOffers({ profil_id, user_id }) {
           </button>
         </div>
       )}
+      {/* Mostrar el chatbot si el usuario tiene plan Pro o Enterprise */}
+      {(plan_id === 2 || plan_id === 3) && <Chatbot />}
     </div>
   );
 }

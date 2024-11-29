@@ -57,7 +57,7 @@ def get_offers(profil_id: int, user_id: int):
 @router.get("/recommended", response_model=List[OfferResponse])
 def get_recommended_offers(user_id: int):
     """
-    Obtener ofertas recomendadas basadas en competencias del candidato.
+    Obtenez des offres recommandées en fonction des compétences du candidat.
     """
     conn = get_snowflake_connection()
     try:
@@ -98,7 +98,7 @@ def create_offer(offer: OfferCreate):
     try:
         cursor = conn.cursor()
         
-        # Consulta para insertar una nueva oferta (sin RETURNING)
+        # Consulta para insertar una nueva oferta
         insert_query = """
         INSERT INTO offres (nom_offert, nom_entreprise, adresse_entreprise, type_poste, salaire, description, date_debut, date_fin, recruteur_id, date_creation)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
@@ -115,7 +115,7 @@ def create_offer(offer: OfferCreate):
                 offer.date_debut,
                 offer.date_fin,
                 offer.recruteur_id,
-                date.today(),  # Fecha de creación
+                date.today(), 
             ),
         )
         

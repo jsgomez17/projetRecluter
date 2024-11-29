@@ -28,7 +28,7 @@ def create_access_token(data: dict):
 def verify_access_token(token: str):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        print("Token decodificado correctamente:", payload)  # Depuración
+        print("Token correctement décodé:", payload)  # Depuración
         return payload  # Devuelve los datos decodificados del token
     except JWTError:
         return None

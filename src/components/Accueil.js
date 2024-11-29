@@ -4,7 +4,7 @@ import React from "react";
 function Accueil() {
   return (
     <div style={containerStyle}>
-      <h1 style={titleStyle}>Bienvenue à L'Emploi</h1>
+      <h1 style={titleStyle}>Bienvenue à Smart Recruit</h1>
       <p style={subtitleStyle}>
         Une plateforme de recrutement intelligente qui connecte les meilleurs
         les talents avec des opportunités appropriées.

@@ -9,6 +9,7 @@ import Accueil from "./components/Accueil";
 import TeleverserCVForm from "./components/TeleverserCVForm";
 import Postulants from "./components/Postulants";
 import OffreForm from "./components/OffreForm";
+import PostulerForm from "./components/PostulerForm";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false); // Estado para autenticación
@@ -20,12 +21,15 @@ function App() {
     setUser(userData);
     // Almacena el token en el localStorage
     localStorage.setItem("authToken", userData.token);
+    localStorage.setItem("user", JSON.stringify(userData));
     navigate("/offers"); // Redirigir siempre a la página de ofertas después del login
   };
 
   const handleLogout = () => {
     setIsAuthenticated(false);
     setUser(null);
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("user");
     navigate("/"); // Redirigir a la página de inicio después del logout
   };
 
@@ -41,13 +45,30 @@ function App() {
             path="/offers"
             element={
               isAuthenticated ? (
-                <JobOffers profil_id={user?.profil_id} user_id={user?.id} />
+                <JobOffers
+                  profil_id={user?.profil_id}
+                  user_id={user?.id}
+                  plan_id={user?.plan_id}
+                />
               ) : (
                 <p>Veuillez vous connecter pour voir les offres.</p>
               )
             }
           />
           <Route path="/upload-cv" element={<TeleverserCVForm />} />
+          <Route
+            path="/postuler-form/:offerId"
+            element={
+              isAuthenticated ? (
+                <PostulerForm
+                  user_id={user?.id}
+                  user_plan={user?.plan_id} // Pasar el plan_id
+                />
+              ) : (
+                <p>Veuillez vous connecter pour postuler.</p>
+              )
+            }
+          />
           <Route path="/offre-form" element={<OffreForm />} />
           <Route path="/postulants/:offerId" element={<Postulants />} />{" "}
           {/* Nueva ruta */}

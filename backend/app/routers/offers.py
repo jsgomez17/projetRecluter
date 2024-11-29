@@ -52,6 +52,45 @@ def get_offers(profil_id: int, user_id: int):
         ]
     finally:
         conn.close()
+        
+
+@router.get("/recommended", response_model=List[OfferResponse])
+def get_recommended_offers(user_id: int):
+    """
+    Obtener ofertas recomendadas basadas en competencias del candidato.
+    """
+    conn = get_snowflake_connection()
+    try:
+        cursor = conn.cursor()
+        query = """
+        SELECT o.id, o.nom_offert, o.nom_entreprise, o.adresse_entreprise, 
+               o.type_poste, o.salaire, o.description, 
+               o.date_debut, o.date_fin, o.date_creation
+        FROM offres o
+        INNER JOIN competences_offres co ON co.offre_id = o.id
+        INNER JOIN competences_candidats cc ON cc.competence = co.competence
+        INNER JOIN utilisateurs u ON u.id = cc.utilisateur_id
+        WHERE u.id = %s
+        """
+        cursor.execute(query, (user_id,))
+        results = cursor.fetchall()
+        return [
+            {
+                "id": row[0],
+                "nom_offert": row[1],
+                "nom_entreprise": row[2],
+                "adresse_entreprise": row[3],
+                "type_poste": row[4],
+                "salaire": row[5],
+                "description": row[6],
+                "date_debut": row[7],
+                "date_fin": row[8],
+                "date_creation": row[9],
+            }
+            for row in results
+        ]
+    finally:
+        conn.close()
 
 @router.post("/", response_model=OfferResponse)
 def create_offer(offer: OfferCreate):

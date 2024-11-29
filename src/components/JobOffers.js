@@ -2,11 +2,13 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useCheckCV from "../hooks/useCheckCV";
 import axios from "axios";
-import "./JobOffers.css"; // Asegúrate de que el CSS actualizado esté importado
+import "./JobOffers.css";
 
 function JobOffers({ profil_id, user_id }) {
   const { hasCV, loading, error } = useCheckCV(user_id);
+  const [activeTab, setActiveTab] = useState("all"); // Controla la pestaña activa
   const [offers, setOffers] = useState([]);
+  const [recommendedOffers, setRecommendedOffers] = useState([]);
   const navigate = useNavigate(); // Hook para la navegación
 
   // Redirigir al candidato si no tiene CV cargado
@@ -34,6 +36,29 @@ function JobOffers({ profil_id, user_id }) {
     }
   }, [profil_id, user_id, hasCV]);
 
+  useEffect(() => {
+    // Cargar ofertas recomendadas desde el backend
+    const fetchRecommendedOffers = async () => {
+      try {
+        const response = await axios.get(
+          "http://127.0.0.1:8000/offers/recommended",
+          { params: { user_id } }
+        );
+        setRecommendedOffers(response.data);
+      } catch (error) {
+        console.error("Error al cargar las ofertas recomendadas:", error);
+      }
+    };
+    if (profil_id === 2) {
+      fetchRecommendedOffers(); // Cargar ofertas recomendadas solo para candidatos
+    }
+  }, [profil_id, user_id]);
+
+  // Manejo de pestañas
+  const handleTabClick = (tab) => {
+    setActiveTab(tab);
+  };
+
   // Manejo de clic para postular
   const handlePostuler = (offerId) => {
     navigate(`/postuler-form/${offerId}`); // Navegar al formulario de postulación con el ID de la oferta
@@ -56,58 +81,164 @@ function JobOffers({ profil_id, user_id }) {
   if (error) {
     return <p>Error al verificar el CV: {error.message}</p>;
   }
+
   return (
     <div className="job-offers-container">
       <h2>Offres d'emploi</h2>
-      <div className="offers-grid">
-        {offers.length === 0 ? (
-          <p>Aucune offre disponible.</p>
-        ) : (
-          offers.map((offer) => (
-            <div key={offer.id} className="offer-card">
-              <h3>{offer.nom_offert}</h3>
-              <p>
-                <strong>Entreprise:</strong> {offer.nom_entreprise}
-              </p>
-              <p>
-                <strong>Adresse:</strong> {offer.adresse_entreprise}
-              </p>
-              <p>
-                <strong>Type de Poste:</strong> {offer.type_poste}
-              </p>
-              <p>
-                <strong>Salaire:</strong> {offer.salaire} $
-              </p>
-              <p>
-                <strong>Description:</strong> {offer.description}
-              </p>
-              <p>
-                <strong>Date début:</strong>{" "}
-                {new Date(offer.date_debut).toLocaleDateString()}
-              </p>
-              <p>
-                <strong>Date fin:</strong>{" "}
-                {new Date(offer.date_fin).toLocaleDateString()}
-              </p>
-              {profil_id === 2 ? (
-                <button
-                  className="action-button"
-                  onClick={() => handlePostuler(offer.id)}
-                >
-                  Postuler
-                </button>
-              ) : (
-                <button
-                  className="action-button"
-                  onClick={() => handleViewPostulants(offer.id)}
-                >
-                  Voir les Postulants
-                </button>
-              )}
-            </div>
-          ))
+
+      {/* Mostrar pestañas solo para candidatos */}
+      {profil_id === 2 && (
+        <div className="tabs">
+          <button
+            className={`tab-button ${activeTab === "all" ? "active" : ""}`}
+            onClick={() => handleTabClick("all")}
+          >
+            Toutes les offres
+          </button>
+          <button
+            className={`tab-button ${
+              activeTab === "recommended" ? "active" : ""
+            }`}
+            onClick={() => handleTabClick("recommended")}
+          >
+            Offres recommandées
+          </button>
+        </div>
+      )}
+
+      {/* Contenido de las pestañas */}
+      <div className="tab-content">
+        {profil_id === 1 && (
+          // Ofertas creadas por el reclutador
+          <div className="offers-grid">
+            {offers.length === 0 ? (
+              <p>Aucune offre disponible.</p>
+            ) : (
+              offers.map((offer) => (
+                <div key={offer.id} className="offer-card">
+                  <h3>{offer.nom_offert}</h3>
+                  <p>
+                    <strong>Entreprise:</strong> {offer.nom_entreprise}
+                  </p>
+                  <p>
+                    <strong>Adresse:</strong> {offer.adresse_entreprise}
+                  </p>
+                  <p>
+                    <strong>Type de Poste:</strong> {offer.type_poste}
+                  </p>
+                  <p>
+                    <strong>Salaire:</strong> {offer.salaire} $
+                  </p>
+                  <p>
+                    <strong>Description:</strong> {offer.description}
+                  </p>
+                  <p>
+                    <strong>Date début:</strong>{" "}
+                    {new Date(offer.date_debut).toLocaleDateString()}
+                  </p>
+                  <p>
+                    <strong>Date fin:</strong>{" "}
+                    {new Date(offer.date_fin).toLocaleDateString()}
+                  </p>
+                  <button
+                    className="action-button"
+                    onClick={() => handleViewPostulants(offer.id)}
+                  >
+                    Voir les Postulants
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+
+        {profil_id === 2 && activeTab === "all" && (
+          <div className="offers-grid">
+            {offers.length === 0 ? (
+              <p>Aucune offre disponible.</p>
+            ) : (
+              offers.map((offer) => (
+                <div key={offer.id} className="offer-card">
+                  <h3>{offer.nom_offert}</h3>
+                  <p>
+                    <strong>Entreprise:</strong> {offer.nom_entreprise}
+                  </p>
+                  <p>
+                    <strong>Adresse:</strong> {offer.adresse_entreprise}
+                  </p>
+                  <p>
+                    <strong>Type de Poste:</strong> {offer.type_poste}
+                  </p>
+                  <p>
+                    <strong>Salaire:</strong> {offer.salaire} $
+                  </p>
+                  <p>
+                    <strong>Description:</strong> {offer.description}
+                  </p>
+                  <p>
+                    <strong>Date début:</strong>{" "}
+                    {new Date(offer.date_debut).toLocaleDateString()}
+                  </p>
+                  <p>
+                    <strong>Date fin:</strong>{" "}
+                    {new Date(offer.date_fin).toLocaleDateString()}
+                  </p>
+                  <button
+                    className="action-button"
+                    onClick={() => handlePostuler(offer.id)}
+                  >
+                    Postuler
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+
+        {profil_id === 2 && activeTab === "recommended" && (
+          <div className="offers-grid">
+            {recommendedOffers.length === 0 ? (
+              <p>Aucune offre recommandée disponible.</p>
+            ) : (
+              recommendedOffers.map((offer) => (
+                <div key={offer.id} className="offer-card">
+                  <h3>{offer.nom_offert}</h3>
+                  <p>
+                    <strong>Entreprise:</strong> {offer.nom_entreprise}
+                  </p>
+                  <p>
+                    <strong>Adresse:</strong> {offer.adresse_entreprise}
+                  </p>
+                  <p>
+                    <strong>Type de Poste:</strong> {offer.type_poste}
+                  </p>
+                  <p>
+                    <strong>Salaire:</strong> {offer.salaire} $
+                  </p>
+                  <p>
+                    <strong>Description:</strong> {offer.description}
+                  </p>
+                  <p>
+                    <strong>Date début:</strong>{" "}
+                    {new Date(offer.date_debut).toLocaleDateString()}
+                  </p>
+                  <p>
+                    <strong>Date fin:</strong>{" "}
+                    {new Date(offer.date_fin).toLocaleDateString()}
+                  </p>
+                  <button
+                    className="action-button"
+                    onClick={() => handlePostuler(offer.id)}
+                  >
+                    Postuler
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
         )}
       </div>
+
       {profil_id === 1 && (
         <div style={{ marginTop: "20px", textAlign: "center" }}>
           <button className="action-button" onClick={handleCreateOffer}>

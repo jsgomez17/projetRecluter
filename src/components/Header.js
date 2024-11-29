@@ -12,7 +12,7 @@ function Header({ isAuthenticated, onLogout }) {
             style={logoStyle}
           />
         </Link>
-        <h1 style={titleStyle}>L´Emploi</h1>
+        <h1 style={titleStyle}>Smart Recruit</h1>
       </div>
       <nav>
         <Link to="/" style={linkStyle}>

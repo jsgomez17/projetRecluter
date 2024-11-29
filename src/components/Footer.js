@@ -5,7 +5,8 @@ function Footer() {
     <footer style={footerStyle}>
       <div style={footerContainerStyle}>
         <p style={footerTextStyle}>
-          © {new Date().getFullYear()} L'Emploi. Tous les droits sont réservés.
+          © {new Date().getFullYear()} Smart Recruit. Tous les droits sont
+          réservés.
         </p>
       </div>
     </footer>

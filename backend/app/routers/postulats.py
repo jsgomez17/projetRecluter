@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 from app.database import get_snowflake_connection
 from app.schemas.postulats import PostulatCreate, PostulatResponse
 from app.schemas.offers import OfferResponse
+from app.services.ia_smart_recruit import IASmartRecruit
 from datetime import datetime
 from typing import List
 
@@ -13,12 +14,35 @@ def postuler(postulat: PostulatCreate):
     try:
         cursor = conn.cursor()
         
+        ia_smart_recruit = IASmartRecruit()
+        query = """
+        SELECT URL_PDF
+        FROM SMARTRECRUIT_DB.SMARTRECRUIT_SCHEMA.CVS
+        WHERE UTILISATEUR_ID = %s
+        """
+        cursor.execute(query, (postulat.candidat_id,))
+        results = cursor.fetchall()
+        url_pdf = results[0][0]
+        skills_candidate = ia_smart_recruit.get_skills_from_candidate_cv(url_pdf)        
+        
+        query = """
+        SELECT description
+        FROM SMARTRECRUIT_DB.SMARTRECRUIT_SCHEMA.offres
+        WHERE ID = %s
+        """
+        cursor.execute(query, (postulat.offre_id,))
+        results = cursor.fetchall()
+        offer_description = results[0][0]
+        skills_offer = ia_smart_recruit.get_skills_from_offer(offer_description)
+        
+        skills_comparation = ia_smart_recruit.get_skills_comparation(skills_candidate, skills_offer)
+        
         # Insertar el registro en la tabla POSTULATS
         query = """
-        INSERT INTO POSTULATS (CANDIDAT_ID, OFFRE_ID, LETTRE, DATE_POSTULATION)
-        VALUES (%s, %s, %s, %s)
+        INSERT INTO POSTULATS (CANDIDAT_ID, OFFRE_ID, LETTRE, DATE_POSTULATION, ETAT_RECOMMANDE)
+        VALUES (%s, %s, %s, %s, %s)
         """
-        cursor.execute(query, (postulat.candidat_id, postulat.offre_id, postulat.lettre, datetime.utcnow()))
+        cursor.execute(query, (postulat.candidat_id, postulat.offre_id, postulat.lettre, datetime.utcnow(), skills_comparation["suitable"]))
         
         # Recuperar el último ID insertado usando una consulta
         last_id_query = """

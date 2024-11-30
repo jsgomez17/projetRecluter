@@ -4,6 +4,7 @@ import useCheckCV from "../hooks/useCheckCV";
 import axios from "axios";
 import Chatbot from "./Chatbot";
 import "./JobOffers.css";
+import { FaEdit } from "react-icons/fa";
 
 function JobOffers({ profil_id, user_id, plan_id }) {
   const { hasCV, loading, error } = useCheckCV(user_id);
@@ -88,6 +89,10 @@ function JobOffers({ profil_id, user_id, plan_id }) {
     return <p>Erreur lors de la vérification du CV: {error.message}</p>;
   }
 
+  const handleEditOffer = (offerId) => {
+    navigate(`/edit-offer/${offerId}`); // Navegar a la pantalla de edición
+  };
+
   return (
     <div className="job-offers-container">
       <h2>Offres d'emploi</h2>
@@ -122,6 +127,13 @@ function JobOffers({ profil_id, user_id, plan_id }) {
             ) : (
               offers.map((offer) => (
                 <div key={offer.id} className="offer-card">
+                  {profil_id === 1 && (
+                    <FaEdit
+                      className="edit-icon"
+                      onClick={() => handleEditOffer(offer.id)}
+                      title="Modifier l'offre"
+                    />
+                  )}
                   <h3>{offer.nom_offert}</h3>
                   <p>
                     <strong>Entreprise:</strong> {offer.nom_entreprise}

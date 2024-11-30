@@ -1,6 +1,7 @@
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from fastapi.responses import FileResponse
 from app.database import get_snowflake_connection
+from app.services.ia_smart_recruit import IASmartRecruit
 from datetime import datetime
 import os
 import shutil
@@ -71,10 +72,21 @@ def upload_cv(
         VALUES (%s, %s, %s)
         """
         cursor.execute(query_insert, (utilisateur_id, file_path, datetime.utcnow()))
+        
+        # Create an instance of the class
+        ia_smart_recruit = IASmartRecruit()
+        # Get skills from candidate cv
+        skills_candidate = ia_smart_recruit.get_skills_from_candidate_cv(file_path)
+        query_insert = """
+        INSERT INTO SMARTRECRUIT_DB.SMARTRECRUIT_SCHEMA.COMPETENCES_CANDIDATS (UTILISATEUR_ID, COMPETENCE, NIVEAU)
+        VALUES (%s, %s, %s)
+        """
+        for skill in skills_candidate["skills"]:
+            cursor.execute(query_insert, (utilisateur_id, skill['skill'], skill['years']))
+        
         conn.commit()
     finally:
         conn.close()
-
     return {"message": "CV téléchargé avec succès.", "url": file_path}
 
 @router.get("/download-cv")

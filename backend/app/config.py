@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     SNOWFLAKE_DATABASE: str
     SNOWFLAKE_SCHEMA: str
     SNOWFLAKE_WAREHOUSE: str
+    OPENAI_API_KEY: str
 
     class Config:
         env_file = os.path.join(os.path.dirname(__file__), ".env")  # Cambiar la ruta al .env

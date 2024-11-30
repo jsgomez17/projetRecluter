@@ -4,9 +4,11 @@ from datetime import date
 from typing import List
 from app.schemas.offers import OfferResponse, OfferCreate
 from app.utils.auth import get_current_user
+from app.services.ia_smart_recruit import IASmartRecruit
 
 router = APIRouter()
 
+#mostrar todas las ofertas
 @router.get("/", response_model=List[OfferResponse])
 def get_offers(profil_id: int, user_id: int):
     conn = get_snowflake_connection()
@@ -54,6 +56,7 @@ def get_offers(profil_id: int, user_id: int):
         conn.close()
         
 
+#para buscar las ofertas recomendadas para un candidato
 @router.get("/recommended", response_model=List[OfferResponse])
 def get_recommended_offers(user_id: int):
     """
@@ -92,6 +95,7 @@ def get_recommended_offers(user_id: int):
     finally:
         conn.close()
 
+#creacion de una oferta
 @router.post("/", response_model=OfferResponse)
 def create_offer(offer: OfferCreate):
     conn = get_snowflake_connection()
@@ -135,6 +139,17 @@ def create_offer(offer: OfferCreate):
         if not result:
             raise HTTPException(status_code=400, detail="Erreur lors de la création de l'offre")
 
+        # Create an instance of the class
+        ia_smart_recruit = IASmartRecruit("gpt-3.5-turbo")
+        # Get skills from candidate cv
+        skills_candidate = ia_smart_recruit.get_skills_from_offer(offer.description)
+        query_insert = """
+        INSERT INTO SMARTRECRUIT_DB.SMARTRECRUIT_SCHEMA.COMPETENCES_OFFRES (OFFRE_ID, COMPETENCE, NIVEAU)
+        VALUES (%s, %s, %s)
+        """
+        for skill in skills_candidate["skills"]:
+            cursor.execute(query_insert, (result[0], skill['skill'], skill['years']))
+        
         # Devolver la oferta creada
         return OfferResponse(
             id=result[0],
@@ -149,5 +164,112 @@ def create_offer(offer: OfferCreate):
             recruteur_id=result[9],
             date_creation=result[10],
         )
+    finally:
+        conn.close()
+
+#buscar una oferta por id
+@router.get("/{offer_id}", response_model=OfferResponse)
+def get_offer(offer_id: int):
+    """
+    Obtener una oferta específica por ID.
+    """
+    conn = get_snowflake_connection()
+    try:
+        cursor = conn.cursor()
+        query = """
+        SELECT id, nom_offert, nom_entreprise, adresse_entreprise, 
+               type_poste, salaire, description, 
+               date_debut, date_fin, recruteur_id, date_creation
+        FROM offres
+        WHERE id = %s
+        """
+        cursor.execute(query, (offer_id,))
+        result = cursor.fetchone()
+
+        if not result:
+            raise HTTPException(status_code=404, detail="Offre non trouvée")
+
+        return {
+            "id": result[0],
+            "nom_offert": result[1],
+            "nom_entreprise": result[2],
+            "adresse_entreprise": result[3],
+            "type_poste": result[4],
+            "salaire": result[5],
+            "description": result[6],
+            "date_debut": result[7],
+            "date_fin": result[8],
+            "recruteur_id": result[9],
+            "date_creation": result[10],
+        }
+    finally:
+        conn.close()
+        
+#modificar una oferta por id
+@router.put("/{offer_id}", response_model=OfferResponse)
+def update_offer(offer_id: int, updated_offer: OfferCreate):
+    """
+    Mettre à jour une offre spécifique.
+    """
+    conn = get_snowflake_connection()
+    try:
+        cursor = conn.cursor()
+
+        # Actualizar la oferta
+        query = """
+        UPDATE offres
+        SET nom_offert = %s,
+            nom_entreprise = %s,
+            adresse_entreprise = %s,
+            type_poste = %s,
+            salaire = %s,
+            description = %s,
+            date_debut = %s,
+            date_fin = %s
+        WHERE id = %s
+        """
+        cursor.execute(
+            query,
+            (
+                updated_offer.nom_offert,
+                updated_offer.nom_entreprise,
+                updated_offer.adresse_entreprise,
+                updated_offer.type_poste,
+                updated_offer.salaire,
+                updated_offer.description,
+                updated_offer.date_debut,
+                updated_offer.date_fin,
+                offer_id,
+            ),
+        )
+
+        # Confirmar que la oferta fue actualizada
+        if cursor.rowcount == 0:
+            raise HTTPException(status_code=404, detail="Offre non trouvée ou non mise à jour")
+
+        # Recuperar la oferta actualizada
+        query_select = """
+        SELECT id, nom_offert, nom_entreprise, adresse_entreprise, 
+               type_poste, salaire, description, 
+               date_debut, date_fin, recruteur_id, date_creation
+        FROM offres
+        WHERE id = %s
+        """
+        cursor.execute(query_select, (offer_id,))
+        result = cursor.fetchone()
+
+        return {
+            "id": result[0],
+            "nom_offert": result[1],
+            "nom_entreprise": result[2],
+            "adresse_entreprise": result[3],
+            "type_poste": result[4],
+            "salaire": result[5],
+            "description": result[6],
+            "date_debut": result[7],
+            "date_fin": result[8],
+            "recruteur_id": result[9],
+            "date_creation": result[10],
+        }
     finally:
         conn.close()

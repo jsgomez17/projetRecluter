@@ -19,6 +19,7 @@
 
 /* Estilos para cada tarjeta de oferta */
 .offer-card {
+  position: relative;
   background-color: white;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -90,4 +91,17 @@
 
 .tab-content {
   margin-top: 20px;
+}
+
+.edit-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 20px;
+  color: #333;
+  cursor: pointer;
+}
+
+.edit-icon:hover {
+  color: #333;
 }

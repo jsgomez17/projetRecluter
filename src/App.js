@@ -11,6 +11,7 @@ import Postulants from "./components/Postulants";
 import OffreForm from "./components/OffreForm";
 import PostulerForm from "./components/PostulerForm";
 import MyApplications from "./components/MyApplications";
+import EditOfferForm from "./components/EditOfferForm";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false); // Estado para autenticación
@@ -92,6 +93,16 @@ function App() {
             }
           />{" "}
           {/* Nueva ruta */}
+          <Route
+            path="/edit-offer/:offerId"
+            element={
+              isAuthenticated && user?.profil_id === 1 ? (
+                <EditOfferForm />
+              ) : (
+                <p>Accès non autorisé.</p>
+              )
+            }
+          />
         </Routes>
       </main>
       <Footer />

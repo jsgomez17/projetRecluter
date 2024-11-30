@@ -76,3 +76,46 @@ def get_applications(candidat_id: int):
         ]
     finally:
         conn.close()
+
+@router.get("/postulants")
+def get_postulants(offre_id: int, recommended_only: bool = False):
+    """
+    Obtenez les postulants pour une offre spécifique.
+    Si `recommended_only` est True, ne renvoyez que les candidats recommandés.
+    """
+    conn = get_snowflake_connection()
+    try:
+        cursor = conn.cursor()
+        
+        # Construcción de la consulta base
+        query = """
+        SELECT u.nom, u.prenom, u.email, p.lettre, c.url_pdf, p.etat_recommande
+        FROM utilisateurs u
+        INNER JOIN postulats p ON p.candidat_id = u.id
+        INNER JOIN offres o ON o.id = p.offre_id
+        INNER JOIN cvs c ON c.utilisateur_id = u.id
+        WHERE o.id = %s
+        """
+        
+        # Añadir filtro para solo candidatos recomendados
+        if recommended_only:
+            query += " AND p.etat_recommande = TRUE"
+        
+        cursor.execute(query, (offre_id,))
+        results = cursor.fetchall()
+
+        return [
+            {
+                "nom": row[0],
+                "prenom": row[1],
+                "email": row[2],
+                "lettre": row[3],
+                "url_pdf": row[4],
+                "etat_recommande": row[5],
+            }
+            for row in results
+        ]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erreur: {str(e)}")
+    finally:
+        conn.close()

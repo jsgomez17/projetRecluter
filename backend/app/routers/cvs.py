@@ -1,4 +1,5 @@
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException
+from fastapi.responses import FileResponse
 from app.database import get_snowflake_connection
 from datetime import datetime
 import os
@@ -75,3 +76,14 @@ def upload_cv(
         conn.close()
 
     return {"message": "CV téléchargé avec succès.", "url": file_path}
+
+@router.get("/download-cv")
+def download_cv(file_name: str):
+    """
+    Ruta para descargar un CV.
+    """
+    sanitized_file_name = file_name.replace("\\", "/")
+    file_path = os.path.join(UPLOAD_DIRECTORY, sanitized_file_name.split("/")[-1])
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="Fichier non trouvé")
+    return FileResponse(file_path, media_type='application/pdf', filename=os.path.basename(file_path))

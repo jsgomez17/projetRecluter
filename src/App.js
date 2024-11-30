@@ -85,7 +85,12 @@ function App() {
             }
           />
           <Route path="/offre-form" element={<OffreForm />} />
-          <Route path="/postulants/:offerId" element={<Postulants />} />{" "}
+          <Route
+            path="/postulants/:offerId"
+            element={
+              isAuthenticated ? <Postulants /> : <p>Veuillez vous connecter.</p>
+            }
+          />{" "}
           {/* Nueva ruta */}
         </Routes>
       </main>

@@ -72,7 +72,7 @@ function JobOffers({ profil_id, user_id, plan_id }) {
 
   // Manejo de clic para ver postulantes
   const handleViewPostulants = (offerId) => {
-    navigate(`/postulants/${offerId}`); // Navegar a la página de postulantes con el ID de la oferta
+    navigate(`/postulants/${offerId}`, { state: { offerId } }); // Navegar a la página de postulantes con el ID de la oferta
   };
 
   // Manejo de clic para crear oferta

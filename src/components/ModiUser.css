@@ -1,48 +1,47 @@
 .modi-user-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
   padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: #f9f9f9;
-  max-width: 600px;
-  margin: 0 auto;
 }
 
-.modi-user-container h2 {
-  font-size: 24px;
+.modi-user-left,
+.modi-user-right {
+  flex: 1;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  background-color: #f9f9f9;
+}
+
+.modi-user-left h2,
+.modi-user-right h2 {
+  font-size: 20px;
   color: #333;
   margin-bottom: 20px;
 }
 
-.modi-user-container h3 {
-  font-size: 20px;
-  margin-bottom: 15px;
-}
-
-.modi-user-container form {
-  margin-bottom: 20px;
-}
-
-.modi-user-container label {
+.modi-user-left label,
+.modi-user-right label {
   display: block;
   margin-bottom: 10px;
-  font-size: 16px;
-  color: #555;
+  font-size: 14px;
 }
 
-.modi-user-container input[type="text"],
-.modi-user-container input[type="email"],
-.modi-user-container input[type="file"] {
+.modi-user-left input,
+.modi-user-right input {
   width: 100%;
-  padding: 10px;
-  font-size: 16px;
+  padding: 8px;
+  font-size: 14px;
   margin-bottom: 15px;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
 
-.modi-user-container button {
-  padding: 10px 20px;
-  font-size: 16px;
+.modi-user-left button,
+.modi-user-right button {
+  padding: 10px 15px;
+  font-size: 14px;
   color: #fff;
   background-color: black;
   border: none;
@@ -50,6 +49,7 @@
   cursor: pointer;
 }
 
-.modi-user-container button:hover {
+.modi-user-left button:hover,
+.modi-user-right button:hover {
   background-color: black;
 }

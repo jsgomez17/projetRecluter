@@ -1,10 +1,23 @@
-import React, { useState } from "react";
-import "./ModiOffer.css";
+import React, { useState, useEffect } from "react";
+import "./ModiOffre.css";
 
 const OfferForm = ({ offer, onSave }) => {
-  const [offerData, setOfferData] = useState(
-    offer || { title: "", description: "", salary: "" }
-  );
+  const [offerData, setOfferData] = useState({
+    title: "",
+    description: "",
+    salary: "",
+  });
+
+  // Pre-cargar los datos de la oferta al montar o actualizar `offer`
+  useEffect(() => {
+    if (offer) {
+      setOfferData({
+        title: offer.title || "",
+        description: offer.description || "",
+        salary: offer.salary || "",
+      });
+    }
+  }, [offer]);
 
   const handleOfferChange = (e) => {
     const { name, value } = e.target;

@@ -1,11 +1,28 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./ModiUser.css";
 
 const PersonalAndFileForm = ({ user, onSavePersonal, onUploadFile }) => {
-  const [personalData, setPersonalData] = useState(
-    user || { name: "", email: "" }
-  );
+  const [personalData, setPersonalData] = useState({
+    nom: "",
+    prenom: "",
+    email: "",
+    rol: "",
+    plan: "",
+  });
   const [file, setFile] = useState(null);
+
+  // Pre-cargar los datos del usuario cuando `user` cambia
+  useEffect(() => {
+    if (user) {
+      setPersonalData({
+        nom: user.nom || "",
+        prenom: user.prenom || "",
+        email: user.email || "",
+        rol: user.rol || "",
+        plan: user.plan || "",
+      });
+    }
+  }, [user]);
 
   const handlePersonalChange = (e) => {
     const { name, value } = e.target;
@@ -32,41 +49,97 @@ const PersonalAndFileForm = ({ user, onSavePersonal, onUploadFile }) => {
 
   return (
     <div className="modi-user-container">
-      <h2>Formulaire de Données Personnelles et Téléchargement de Fichier</h2>
-      <form onSubmit={handlePersonalSubmit}>
-        <h3>Modifier les Données Personnelles</h3>
-        <label>
-          Nom:
-          <input
-            type="text"
-            name="name"
-            value={personalData.name}
-            onChange={handlePersonalChange}
-          />
-        </label>
-        <br />
-        <label>
-          Email:
-          <input
-            type="email"
-            name="email"
-            value={personalData.email}
-            onChange={handlePersonalChange}
-          />
-        </label>
-        <br />
-        <button type="submit">Enregistrer les Données Personnelles</button>
-      </form>
-      <hr />
-      <form onSubmit={handleFileSubmit}>
-        <h3>Télécharger un Fichier</h3>
-        <label>
-          Sélectionner un fichier :
-          <input type="file" onChange={handleFileChange} />
-        </label>
-        <br />
-        <button type="submit">Télécharger le Fichier</button>
-      </form>
+      {/* Section gauche - Données personnelles */}
+      <div className="modi-user-left">
+        <h2>Modifier les Données Personnelles</h2>
+        <form onSubmit={handlePersonalSubmit}>
+          <label>
+            Nom:
+            <input
+              type="text"
+              name="nom"
+              value={personalData.nom}
+              onChange={handlePersonalChange}
+              required
+            />
+          </label>
+          <br />
+          <label>
+            Prénom:
+            <input
+              type="text"
+              name="prenom"
+              value={personalData.prenom}
+              onChange={handlePersonalChange}
+              required
+            />
+          </label>
+          <br />
+          <label>
+            Email:
+            <input
+              type="email"
+              name="email"
+              value={personalData.email}
+              onChange={handlePersonalChange}
+              required
+            />
+          </label>
+          <br />
+          <label>
+            Rôle:
+            <select
+              name="rol"
+              value={personalData.rol}
+              onChange={handlePersonalChange}
+              required
+            >
+              <option value="">Sélectionnez un Rôle</option>
+              <option value="Candidat">Candidat</option>
+              <option value="Recruteur">Recruteur</option>
+            </select>
+          </label>
+          <br />
+          <label>
+            Type de Plan:
+            <select
+              name="plan"
+              value={personalData.plan}
+              onChange={handlePersonalChange}
+              required
+            >
+              <option value="">Sélectionner un Plan</option>
+              {personalData.rol === "Candidat" && (
+                <>
+                  <option value="Basique">Basique</option>
+                  <option value="Pro">Pro</option>
+                </>
+              )}
+              {personalData.rol === "Recruteur" && (
+                <>
+                  <option value="Basique">Basique</option>
+                  <option value="Enterprise">Enterprise</option>
+                </>
+              )}
+            </select>
+          </label>
+          <br />
+          <button type="submit">Enregistrer les Données Personnelles</button>
+        </form>
+      </div>
+
+      {/* Section droite - Téléchargement de fichier */}
+      <div className="modi-user-right">
+        <h2>Télécharger un Fichier</h2>
+        <form onSubmit={handleFileSubmit}>
+          <label>
+            Sélectionner un fichier :
+            <input type="file" onChange={handleFileChange} />
+          </label>
+          <br />
+          <button type="submit">Télécharger le Fichier</button>
+        </form>
+      </div>
     </div>
   );
 };

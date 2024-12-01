@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from app.database import get_snowflake_connection
 from datetime import date
 from typing import List
-from app.schemas.offers import OfferResponse, OfferCreate
+from app.schemas.offers import OfferResponse, OfferCreate, OfferUpdate
 from app.utils.auth import get_current_user
 from app.services.ia_smart_recruit import IASmartRecruit
 
@@ -207,7 +207,7 @@ def get_offer(offer_id: int):
         
 #modificar una oferta por id
 @router.put("/{offer_id}", response_model=OfferResponse)
-def update_offer(offer_id: int, updated_offer: OfferCreate):
+def update_offer(offer_id: int, updated_offer: OfferUpdate):
     """
     Mettre à jour une offre spécifique.
     """
@@ -271,5 +271,27 @@ def update_offer(offer_id: int, updated_offer: OfferCreate):
             "recruteur_id": result[9],
             "date_creation": result[10],
         }
+    finally:
+        conn.close()
+
+#elimina una oferta por id
+@router.delete("/{offer_id}", status_code=204)
+def delete_offer(offer_id: int):
+    """
+    Supprimer une offre spécifique par ID.
+    """
+    conn = get_snowflake_connection()
+    try:
+        cursor = conn.cursor()
+        
+        # Eliminar la oferta
+        query = "DELETE FROM offres WHERE id = %s"
+        cursor.execute(query, (offer_id,))
+        
+        # Verificar si se eliminó alguna fila
+        if cursor.rowcount == 0:
+            raise HTTPException(status_code=404, detail="Offre non trouvée")
+        
+        return {"message": "Offre supprimée avec succès"}
     finally:
         conn.close()

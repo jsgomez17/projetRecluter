@@ -26,5 +26,15 @@ class OfferResponse(BaseModel):
     date_debut: date
     date_fin: date
 
+class OfferUpdate(BaseModel):
+    nom_offert: str
+    nom_entreprise: str
+    adresse_entreprise: str
+    type_poste: str
+    salaire: float
+    description: str
+    date_debut: date
+    date_fin: date
+    
     class Config:
         orm_mode = True

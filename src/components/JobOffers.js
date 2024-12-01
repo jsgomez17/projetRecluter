@@ -4,7 +4,7 @@ import useCheckCV from "../hooks/useCheckCV";
 import axios from "axios";
 import Chatbot from "./Chatbot";
 import "./JobOffers.css";
-import { FaEdit } from "react-icons/fa";
+import { FaEdit, FaTrash } from "react-icons/fa";
 
 function JobOffers({ profil_id, user_id, plan_id }) {
   const { hasCV, loading, error } = useCheckCV(user_id);
@@ -93,6 +93,25 @@ function JobOffers({ profil_id, user_id, plan_id }) {
     navigate(`/edit-offer/${offerId}`); // Navegar a la pantalla de edición
   };
 
+  const handleDeleteOffer = async (offerId) => {
+    const confirmDelete = window.confirm(
+      "Êtes-vous sûr de vouloir supprimer cette offre ?"
+    );
+    if (!confirmDelete) return;
+
+    try {
+      await axios.delete(`http://127.0.0.1:8000/offers/${offerId}`);
+      alert("Offre supprimée avec succès.");
+      // Filtrar las ofertas para eliminar la oferta eliminada
+      setOffers((prevOffers) =>
+        prevOffers.filter((offer) => offer.id !== offerId)
+      );
+    } catch (error) {
+      console.error("Erreur lors de la suppression de l'offre:", error);
+      alert("Erreur lors de la suppression de l'offre.");
+    }
+  };
+
   return (
     <div className="job-offers-container">
       <h2>Offres d'emploi</h2>
@@ -128,11 +147,18 @@ function JobOffers({ profil_id, user_id, plan_id }) {
               offers.map((offer) => (
                 <div key={offer.id} className="offer-card">
                   {profil_id === 1 && (
-                    <FaEdit
-                      className="edit-icon"
-                      onClick={() => handleEditOffer(offer.id)}
-                      title="Modifier l'offre"
-                    />
+                    <div className="action-icons">
+                      <FaEdit
+                        className="edit-icon"
+                        onClick={() => handleEditOffer(offer.id)}
+                        title="Modifier l'offre"
+                      />
+                      <FaTrash
+                        className="delete-icon"
+                        onClick={() => handleDeleteOffer(offer.id)}
+                        title="Supprimer l'offre"
+                      />
+                    </div>
                   )}
                   <h3>{offer.nom_offert}</h3>
                   <p>
@@ -147,7 +173,7 @@ function JobOffers({ profil_id, user_id, plan_id }) {
                   <p>
                     <strong>Salaire:</strong> {offer.salaire} $
                   </p>
-                  <p>
+                  <p className="description">
                     <strong>Description:</strong> {offer.description}
                   </p>
                   <p>
@@ -190,7 +216,7 @@ function JobOffers({ profil_id, user_id, plan_id }) {
                   <p>
                     <strong>Salaire:</strong> {offer.salaire} $
                   </p>
-                  <p>
+                  <p className="description">
                     <strong>Description:</strong> {offer.description}
                   </p>
                   <p>
@@ -233,7 +259,7 @@ function JobOffers({ profil_id, user_id, plan_id }) {
                   <p>
                     <strong>Salaire:</strong> {offer.salaire} $
                   </p>
-                  <p>
+                  <p className="description">
                     <strong>Description:</strong> {offer.description}
                   </p>
                   <p>

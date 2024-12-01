@@ -53,7 +53,7 @@ function MyApplications({ user_id }) {
               <p>
                 <strong>Salaire:</strong> {offer.salaire} $
               </p>
-              <p>
+              <p className="description">
                 <strong>Description:</strong> {offer.description}
               </p>
               <p>

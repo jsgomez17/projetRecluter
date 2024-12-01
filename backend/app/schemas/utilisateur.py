@@ -23,7 +23,18 @@ class UtilisateurResponse(BaseModel):
 
     class Config:
         orm_mode = True
-        
+
+class UtilisateurUpdate(BaseModel):
+    nom: str
+    prenom: str
+    email: EmailStr
+    mot_de_passe: str
+    profil_id: Optional[int]
+    plan_id: Optional[int]
+
+    class Config:
+        orm_mode = True
+
 class LoginRequest(BaseModel):
     email: str
     mot_de_passe: str

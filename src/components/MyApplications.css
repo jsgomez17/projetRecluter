@@ -7,19 +7,45 @@
 }
 
 .applications-grid {
-  display: grid; /* Activa el grid layout */
-  grid-template-columns: repeat(
-    3,
-    1fr
-  ); /* Define 3 columnas del mismo tamaño */
-  gap: 20px; /* Espaciado entre los elementos */
-  padding: 10px; /* Espaciado interno del contenedor */
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Tres columnas */
+  gap: 20px; /* Espaciado entre las tarjetas */
+  justify-content: center; /* Centrar las tarjetas horizontalmente */
+  align-items: start; /* Alinear las tarjetas al inicio */
 }
 
 .application-card {
+  position: relative;
+  background-color: white;
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 20px;
-  background-color: white;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 400px;
+  max-height: 400px;
+}
+
+.application-card .description {
+  max-height: 100px; /* Altura máxima del contenedor de la descripción */
+  overflow-y: auto; /* Habilitar desplazamiento vertical */
+  padding: 5px; /* Opcional, para agregar un poco de espacio interno */
+  border: 1px solid #ddd; /* Opcional, para resaltar el área de la descripción */
+  border-radius: 4px; /* Opcional, bordes redondeados */
+}
+
+/* Ajuste de fuente */
+.application-card h3 {
+  margin-bottom: 10px;
+  color: #333;
+  font-size: 1.2em;
+}
+
+.application-card p {
+  margin: 5px 0;
+  color: #555;
+  font-size: 0.9em;
 }

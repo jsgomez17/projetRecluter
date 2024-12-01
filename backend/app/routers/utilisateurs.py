@@ -1,8 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from app.database import get_snowflake_connection
-from app.schemas.utilisateur import UtilisateurCreate, UtilisateurResponse, LoginRequest
-from app.utils.security import hash_password, verify_password
-from app.utils.security import create_access_token, verify_access_token
+from app.schemas.utilisateur import UtilisateurCreate, UtilisateurResponse, LoginRequest, UtilisateurUpdate
+from app.utils.security import hash_password, verify_password, create_access_token
 from app.utils.auth import get_current_user
 from typing import List
 
@@ -120,6 +119,54 @@ def get_utilisateur(user_id: int):
     finally:
         conn.close()
 
+#modificacion de informacion de un usuario
+@router.put("/{user_id}", status_code=204)
+def update_user(user_id: int, user_data: UtilisateurUpdate):
+    conn = get_snowflake_connection()
+    try:
+        cursor = conn.cursor()
+        fields = []
+        values = []
+
+        # Encriptar la contraseña si se incluye en los datos del usuario
+        if user_data.password:
+            hashed_password = hash_password(user_data.password)
+            fields.append("password = %s")
+            values.append(hashed_password)
+
+        if user_data.nom:
+            fields.append("nom = %s")
+            values.append(user_data.nom)
+        if user_data.prenom:
+            fields.append("prenom = %s")
+            values.append(user_data.prenom)
+        if user_data.email:
+            fields.append("email = %s")
+            values.append(user_data.email)
+        if user_data.role:
+            fields.append("role = %s")
+            values.append(user_data.role)
+        if user_data.plan:
+            fields.append("plan = %s")
+            values.append(user_data.plan)
+
+        if not fields:
+            raise HTTPException(
+                status_code=400, detail="Il n'y a aucun champ à mettre à jour."
+            )
+
+        query = f"UPDATE utilisateurs SET {', '.join(fields)} WHERE id = %s"
+        values.append(user_id)
+
+        cursor.execute(query, tuple(values))
+
+        if cursor.rowcount == 0:
+            raise HTTPException(status_code=404, detail="Utilisateur introuvable.")
+
+        return {"message": "Données personnelles mises à jour avec succès."}
+    finally:
+        conn.close()
+
 #validación para el login
 @router.post("/login")
 def login(login_request: LoginRequest):
@@ -166,6 +213,8 @@ def login(login_request: LoginRequest):
         }
     finally:
         conn.close()
+
+
 
 
 @router.get("/dashboard")

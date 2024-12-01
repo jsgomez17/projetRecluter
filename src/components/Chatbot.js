@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import "./Chatbot.css";
+import axios from "axios";
 
-function Chatbot() {
+function Chatbot({ profil_id, user_id, plan_id }) {
   const [isOpen, setIsOpen] = useState(false); // Estado para mostrar u ocultar el chatbot
   const [messages, setMessages] = useState([]); // Mensajes enviados y recibidos
   const [userMessage, setUserMessage] = useState(""); // Mensaje actual del usuario
@@ -18,16 +19,26 @@ function Chatbot() {
 
     // Simular una respuesta del chatbot
     try {
-      const response = await fetch("http://127.0.0.1:8000/chatbot", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: userMessage }),
-      });
-      const data = await response.json();
+      const isCandidat = profil_id === 2;
+      var response = null;
+      if (isCandidat) {
+        response = await axios.get("http://127.0.0.1:8000/chat/candidat", {
+          params: { candidat_id: user_id, question: userMessage },
+        });
+      } else {
+        response = await axios.get("http://127.0.0.1:8000/chat/recruiter", {
+          params: { recruiter_id: user_id, question: userMessage },
+        });
+      }
+      console.info(response.data);
 
       // Añadir la respuesta del chatbot al historial
-      setMessages((prev) => [...prev, { sender: "bot", text: data.response }]);
+      setMessages((prev) => [
+        ...prev,
+        { sender: "bot", text: response.data["answer"] },
+      ]);
     } catch (error) {
+      console.error(error);
       setMessages((prev) => [
         ...prev,
         {

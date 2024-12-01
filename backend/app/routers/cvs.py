@@ -32,62 +32,89 @@ def check_cv(utilisateur_id: int):
     finally:
         conn.close()
 
-@router.post("/upload-cv")
-def upload_cv(
+@router.post("/update-cv")
+def update_cv(
     utilisateur_id: int = Form(...),
     file: UploadFile = File(...),
 ):
     """
-    Endpoint pour télécharger un CV pour un utilisateur spécifique.
+    Endpoint pour mettre à jour ou télécharger un CV pour un utilisateur spécifique.
     """
     # Validar el tipo de archivo
     if not file.filename.endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Le fichier doit être un PDF.")
 
-    # Verificar si el usuario ya tiene un CV cargado
     conn = get_snowflake_connection()
     try:
         cursor = conn.cursor()
+
+        # Verificar si el usuario ya tiene un CV cargado
         query_check = """
-        SELECT COUNT(*)
+        SELECT URL_PDF
         FROM SMARTRECRUIT_DB.SMARTRECRUIT_SCHEMA.CVS
         WHERE UTILISATEUR_ID = %s
         """
         cursor.execute(query_check, (utilisateur_id,))
         result = cursor.fetchone()
-        if result and result[0] > 0:
-            raise HTTPException(
-                status_code=400,
-                detail="Un CV existe déjà pour cet utilisateur. Supprimez l'ancien CV avant d'en ajouter un nouveau.",
-            )
 
-        # Guardar el archivo en el servidor
-        file_path = os.path.join(UPLOAD_DIRECTORY, f"{utilisateur_id}_{file.filename}")
-        with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
+        # Si ya existe un CV, eliminar el archivo viejo
+        if result and result[0]:
+            old_file_path = result[0]
+            if os.path.exists(old_file_path):
+                os.remove(old_file_path)
 
-        # Insertar información en la base de datos
-        query_insert = """
-        INSERT INTO SMARTRECRUIT_DB.SMARTRECRUIT_SCHEMA.CVS (UTILISATEUR_ID, URL_PDF, DATE_TELECHARGEMENT)
-        VALUES (%s, %s, %s)
-        """
-        cursor.execute(query_insert, (utilisateur_id, file_path, datetime.utcnow()))
-        
-        # Create an instance of the class
+            # Actualizar la entrada existente en la base de datos
+            file_path = os.path.join(UPLOAD_DIRECTORY, f"{utilisateur_id}_{file.filename}")
+            with open(file_path, "wb") as buffer:
+                shutil.copyfileobj(file.file, buffer)
+
+            query_update = """
+            UPDATE SMARTRECRUIT_DB.SMARTRECRUIT_SCHEMA.CVS
+            SET URL_PDF = %s, DATE_TELECHARGEMENT = %s
+            WHERE UTILISATEUR_ID = %s
+            """
+            cursor.execute(query_update, (file_path, datetime.utcnow(), utilisateur_id))
+        else:
+            # Si no existe, insertar una nueva entrada
+            file_path = os.path.join(UPLOAD_DIRECTORY, f"{utilisateur_id}_{file.filename}")
+            with open(file_path, "wb") as buffer:
+                shutil.copyfileobj(file.file, buffer)
+
+            query_insert = """
+            INSERT INTO SMARTRECRUIT_DB.SMARTRECRUIT_SCHEMA.CVS (UTILISATEUR_ID, URL_PDF, DATE_TELECHARGEMENT)
+            VALUES (%s, %s, %s)
+            """
+            cursor.execute(query_insert, (utilisateur_id, file_path, datetime.utcnow()))
+
+        # Procesar habilidades con IA
         ia_smart_recruit = IASmartRecruit()
-        # Get skills from candidate cv
         skills_candidate = ia_smart_recruit.get_skills_from_candidate_cv(file_path)
-        query_insert = """
+
+        # Eliminar habilidades previas del usuario
+        delete_skills_query = """
+        DELETE FROM SMARTRECRUIT_DB.SMARTRECRUIT_SCHEMA.COMPETENCES_CANDIDATS
+        WHERE UTILISATEUR_ID = %s
+        """
+        cursor.execute(delete_skills_query, (utilisateur_id,))
+
+        # Insertar nuevas habilidades
+        query_insert_skills = """
         INSERT INTO SMARTRECRUIT_DB.SMARTRECRUIT_SCHEMA.COMPETENCES_CANDIDATS (UTILISATEUR_ID, COMPETENCE, NIVEAU)
         VALUES (%s, %s, %s)
         """
         for skill in skills_candidate["skills"]:
-            cursor.execute(query_insert, (utilisateur_id, skill['skill'], skill['years']))
-        
+            cursor.execute(query_insert_skills, (utilisateur_id, skill['skill'], skill['years']))
+
         conn.commit()
+
+    except Exception as e:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=f"Erreur lors de la mise à jour du CV: {str(e)}")
     finally:
         conn.close()
+
     return {"message": "CV téléchargé avec succès.", "url": file_path}
+
 
 @router.get("/download-cv")
 def download_cv(file_name: str):

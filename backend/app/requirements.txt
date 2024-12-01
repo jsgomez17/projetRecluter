@@ -13,3 +13,4 @@ PyPDF2==3.0.1
 python-dotenv
 langchain_community
 langchain-openai
+faiss-cpu==1.7.4

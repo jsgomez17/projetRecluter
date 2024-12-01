@@ -25,10 +25,10 @@ class UtilisateurResponse(BaseModel):
         orm_mode = True
 
 class UtilisateurUpdate(BaseModel):
-    nom: str
-    prenom: str
-    email: EmailStr
-    mot_de_passe: str
+    nom: Optional[str]
+    prenom: Optional[str]
+    email: Optional[EmailStr]
+    mot_de_passe: Optional[str]
     profil_id: Optional[int]
     plan_id: Optional[int]
 

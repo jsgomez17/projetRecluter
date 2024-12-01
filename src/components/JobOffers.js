@@ -291,7 +291,9 @@ function JobOffers({ profil_id, user_id, plan_id }) {
         </div>
       )}
       {/* Mostrar el chatbot si el usuario tiene plan Pro o Enterprise */}
-      {(plan_id === 2 || plan_id === 3) && <Chatbot />}
+      {(plan_id === 2 || plan_id === 3) && (
+        <Chatbot profil_id={profil_id} user_id={user_id} plan_id={plan_id} />
+      )}
     </div>
   );
 }

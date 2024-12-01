@@ -120,52 +120,74 @@ def get_utilisateur(user_id: int):
         conn.close()
 
 #modificacion de informacion de un usuario
-@router.put("/{user_id}", status_code=204)
-def update_user(user_id: int, user_data: UtilisateurUpdate):
+@router.put("/{user_id}", response_model=UtilisateurResponse)
+def update_user(user_id: int, updated_user: UtilisateurUpdate):
+    """
+    Mettre à jour un utilisateur spécifique.
+    """
     conn = get_snowflake_connection()
     try:
         cursor = conn.cursor()
-        fields = []
-        values = []
 
-        # Encriptar la contraseña si se incluye en los datos del usuario
-        if user_data.password:
-            hashed_password = hash_password(user_data.password)
-            fields.append("password = %s")
-            values.append(hashed_password)
+        # Construir la consulta de actualización
+        query = """
+        UPDATE utilisateurs
+        SET nom = %s,
+            prenom = %s,
+            email = %s,
+            mot_de_passe = %s,
+            profil_id = %s,
+            plan_id = %s
+        WHERE id = %s
+        """
+        
+        # Encriptar la contraseña si se proporciona
+        hashed_password = (
+            hash_password(updated_user.mot_de_passe)
+            if updated_user.mot_de_passe
+            else None
+        )
 
-        if user_data.nom:
-            fields.append("nom = %s")
-            values.append(user_data.nom)
-        if user_data.prenom:
-            fields.append("prenom = %s")
-            values.append(user_data.prenom)
-        if user_data.email:
-            fields.append("email = %s")
-            values.append(user_data.email)
-        if user_data.role:
-            fields.append("role = %s")
-            values.append(user_data.role)
-        if user_data.plan:
-            fields.append("plan = %s")
-            values.append(user_data.plan)
+        # Ejecutar la consulta con los valores proporcionados
+        cursor.execute(
+            query,
+            (
+                updated_user.nom,
+                updated_user.prenom,
+                updated_user.email,
+                hashed_password,
+                updated_user.profil_id,
+                updated_user.plan_id,
+                user_id,
+            ),
+        )
 
-        if not fields:
-            raise HTTPException(
-                status_code=400, detail="Il n'y a aucun champ à mettre à jour."
-            )
-
-        query = f"UPDATE utilisateurs SET {', '.join(fields)} WHERE id = %s"
-        values.append(user_id)
-
-        cursor.execute(query, tuple(values))
-
+        # Confirmar que el usuario fue actualizado
         if cursor.rowcount == 0:
-            raise HTTPException(status_code=404, detail="Utilisateur introuvable.")
+            raise HTTPException(status_code=404, detail="Utilisateur introuvable ou non mis à jour.")
 
-        return {"message": "Données personnelles mises à jour avec succès."}
+        # Recuperar los datos actualizados del usuario
+        query_select = """
+        SELECT id, nom, prenom, email, profil_id, plan_id, date_inscription
+        FROM utilisateurs
+        WHERE id = %s
+        """
+        cursor.execute(query_select, (user_id,))
+        result = cursor.fetchone()
+
+        # Retornar el usuario actualizado
+        return UtilisateurResponse(
+            id=result[0],
+            nom=result[1],
+            prenom=result[2],
+            email=result[3],
+            profil_id=result[4],
+            plan_id=result[5],
+            date_inscription=result[6],
+        )
     finally:
         conn.close()
+
 
 #validación para el login
 @router.post("/login")

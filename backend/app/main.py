@@ -1,13 +1,16 @@
 from fastapi import FastAPI
-from app.routers import utilisateurs, offers, cvs, postulats
+from app.routers import utilisateurs, offers, cvs, postulats, chat
 from fastapi.middleware.cors import CORSMiddleware
+from app.session import session_data
 
 app = FastAPI()
+
 
 app.include_router(utilisateurs.router, prefix="/utilisateurs", tags=["Utilisateurs"])
 app.include_router(offers.router, prefix="/offers", tags=["Offers"])
 app.include_router(cvs.router, prefix="/cvs", tags=["CVs"])
 app.include_router(postulats.router, prefix="/postulats",tags=["Postulats"])
+app.include_router(chat.router, prefix="/chat",tags=["Chat"])
 
 @app.get("/")
 def read_root():

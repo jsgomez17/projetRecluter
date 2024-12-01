@@ -23,6 +23,9 @@ function Header({ isAuthenticated, onLogout, profil_id }) {
             <Link to="/offers" style={linkStyle}>
               Offres d'emploi
             </Link>
+            <Link to="/update-user" style={linkStyle}>
+              Modifier profil
+            </Link>
             {isAuthenticated && profil_id === 2 && (
               <Link to="/applications" style={linkStyle}>
                 Mes Candidatures

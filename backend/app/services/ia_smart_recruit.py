@@ -109,7 +109,28 @@ class IASmartRecruit:
         {skills_offer}
         -----
         """
-        self.prompt_skills_comparation = ChatPromptTemplate.from_template(skills_comparation_template)
+        self.prompt_skills_comparation = ChatPromptTemplate.from_template(skills_comparation_template)        
+
+        letter_template = r"""
+        Given as context the cv of a candidate, and the text with the description of the offer and the name of the offering company. Please write a cover letter for the candidate that takes into account a brief summary of my experience, highlighting the key points for the offer. A short description of the position and showing how and why the candidate would be a perfect fit for the position. Also mention any additional skills or soft skills that may be relevant to the offer. All written in a professional, formal but enthusiastic tone. Also add my contact details.
+        candidate's data:
+        -----
+        {data_candidate}
+        -----
+        the candidate's cv:
+        -----
+        {cv_candidate}
+        -----
+        the employer's data:
+        -----
+        {data_employer}
+        -----
+        the job description:
+        -----
+        {job_description}
+        -----
+        """
+        self.prompt_letter = ChatPromptTemplate.from_template(letter_template)
         
     def init_chains(self):
         """
@@ -118,6 +139,7 @@ class IASmartRecruit:
         self.chain_skills_candidate = self.prompt_skills_candidate | self.model | self.parser
         self.chain_skills_offer = self.prompt_skills_offer | self.model | self.parser
         self.chain_skills_comparation = self.prompt_skills_comparation | self.model | self.parser
+        self.chain_letter = self.prompt_letter | self.model | self.parser
 
     def get_skills_from_candidate_cv(self, pdf_doc):
         """
@@ -167,6 +189,18 @@ class IASmartRecruit:
                     skills_comparation.append({"candidate_skill": skill_candidate["skill"], "offer_skill": skill_offer["skill"], "suitable": 1})
         return {"suitable": 1 if len(skills_comparation) > 0 else 0, "skills": skills_comparation}
         
+    def get_cover_letter(self, data_candidate, cv_candidate, data_employer, job_description):
+        """
+        Get cover letter
+        :param data_candidate: candidate's data
+        :param cv_candidate: candidate's cv
+        :param job_description: job description
+        :param employer_name: employer name
+        :return: cover letter
+        """
+        cover_letter = self.chain_letter.invoke(
+            {"data_candidate" : data_candidate, "cv_candidate" : cv_candidate, "data_employer" : data_employer, "job_description" : job_description})
+        return cover_letter
 
 # Example of use
 if __name__ == "__main__":

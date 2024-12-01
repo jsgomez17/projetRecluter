@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from app.database import get_snowflake_connection
 from app.schemas.postulats import PostulatCreate, PostulatResponse
 from app.schemas.offers import OfferResponse
-from app.services.ia_smart_recruit import IASmartRecruit
+from app.services.ia_smart_recruit import IASmartRecruit, UtilsSmartRecruit
 from datetime import datetime
 from typing import List
 
@@ -139,6 +139,50 @@ def get_postulants(offre_id: int, recommended_only: bool = False):
             }
             for row in results
         ]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erreur: {str(e)}")
+    finally:
+        conn.close()
+
+@router.get("/generate-letter")
+def get_letter(candidat_id: int, offre_id: int):
+    """_summary_
+
+    Args:
+        candidat_id (int): _description_
+        offre_id (int): _description_
+    """
+    conn = get_snowflake_connection()
+    try:
+        cursor = conn.cursor()
+                
+        ia_smart_recruit = IASmartRecruit()
+        query = """
+        Select url_pdf, 'firstname: ' || u.nom || ', lastname: ' || u.prenom || ', email: ' || u.email as data_utilisateur
+        from SMARTRECRUIT_DB.SMARTRECRUIT_SCHEMA.utilisateurs u
+        inner join SMARTRECRUIT_DB.SMARTRECRUIT_SCHEMA.cvs c on c.utilisateur_id = u.id
+        WHERE UTILISATEUR_ID = %s
+        """
+        cursor.execute(query, (candidat_id,))
+        results = cursor.fetchall()
+        url_pdf = results[0][0]
+        data_candidate = results[0][1]
+        cv_text = (UtilsSmartRecruit()).get_pdf_text([url_pdf])
+        
+        query = """
+        SELECT description, 'name: ' || o.nom_entreprise as data_entreprise
+        FROM SMARTRECRUIT_DB.SMARTRECRUIT_SCHEMA.offres o
+        WHERE ID = %s
+        """
+        cursor.execute(query, (offre_id,))
+        results = cursor.fetchall()
+        offer_description = results[0][0]
+        data_employer = results[0][1]
+        
+        letter = ia_smart_recruit.get_cover_letter(data_candidate, cv_text, data_employer, offer_description)
+        
+        return {"generated_letter": letter}
+        
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erreur: {str(e)}")
     finally:

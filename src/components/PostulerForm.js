@@ -49,11 +49,13 @@ function PostulerForm() {
     setIsLoading(true);
     try {
       // Lógica para generar la carta con IA
-      const response = await axios.post(
-        "http://127.0.0.1:8000/generate-letter",
+      const response = await axios.get(
+        "http://127.0.0.1:8000/postulats/generate-letter",
         {
-          utilisateur_id: candidat_id,
-          offre_id: offre_id,
+          params: {
+            candidat_id: candidat_id,
+            offre_id: offre_id,
+          },
         }
       );
       setLetter(response.data.generated_letter); // Establecer la carta generada

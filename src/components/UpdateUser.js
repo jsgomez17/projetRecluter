@@ -128,8 +128,10 @@ function UpdateUser({ userId, isRecruiter }) {
               required
             >
               <option value="">Sélectionner un Rôle</option>
-              <option value="Candidat">Candidat</option>
-              <option value="Recruteur">Recruteur</option>
+              <option value="1">Recruteur</option>{" "}
+              {/* ID del rol en el backend */}
+              <option value="2">Candidat</option>{" "}
+              {/* ID del rol en el backend */}
             </select>
           </div>
           <div className="form-field">
@@ -140,9 +142,10 @@ function UpdateUser({ userId, isRecruiter }) {
               required
             >
               <option value="">Sélectionner un Plan</option>
-              <option value="Basic">Basic</option>
-              <option value="Pro">Pro</option>
-              <option value="Entreprise">Entreprise</option>
+              <option value="1">Basic</option> {/* ID del plan en el backend */}
+              <option value="2">Pro</option> {/* ID del plan en el backend */}
+              <option value="3">Entreprise</option>{" "}
+              {/* ID del plan en el backend */}
             </select>
           </div>
           <div className="form-field">

@@ -1,8 +1,11 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import axios from "axios";
 import "./SignupForm.css"; // Importar el CSS
 
 function SignupForm() {
+  const navigate = useNavigate();
   const [nom, setNom] = useState("");
   const [prenom, setPrenom] = useState("");
   const [email, setEmail] = useState("");
@@ -51,14 +54,7 @@ function SignupForm() {
       alert("Utilisateur enregistré avec succès");
       console.log("Réponse du serveur:", response.data);
 
-      // Limpiar el formulario
-      setNom("");
-      setPrenom("");
-      setEmail("");
-      setPassword("");
-      setConfirmPassword("");
-      setRol("");
-      setPlan("");
+      navigate("/login");
     } catch (error) {
       const errorMessage =
         error.response?.data?.detail || "Erreur lors de l'enregistrement";

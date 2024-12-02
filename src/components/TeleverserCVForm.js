@@ -14,8 +14,8 @@ function TeleverserCVForm() {
     e.preventDefault();
     if (cvFile) {
       const formData = new FormData();
-      formData.append("file", cvFile); // Archivo
       formData.append("utilisateur_id", utilisateurId); // ID del usuario
+      formData.append("file", cvFile); // Archivo
       try {
         // Llamada al backend para cargar el CV
         await axios.post("http://127.0.0.1:8000/cvs/upload-cv", formData, {

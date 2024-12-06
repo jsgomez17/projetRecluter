@@ -3,6 +3,8 @@ from app.routers import utilisateurs, offers, cvs, postulats, chat
 from fastapi.middleware.cors import CORSMiddleware
 from app.session import session_data
 
+import uvicorn
+
 app = FastAPI()
 
 
@@ -18,8 +20,11 @@ def read_root():
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Cambia según tu dominio en producción
+    allow_origins=["*"],  # Cambia según tu dominio en producción
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+if __name__ =='__main__':
+    uvicorn.run(app, host='0.0.0.0', port =8000, workers=1)

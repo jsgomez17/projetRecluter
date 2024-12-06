@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 import "./OffreForm.css";
+import { API_IP } from "../config";
 
 function OffreForm() {
   const location = useLocation();
@@ -36,7 +37,7 @@ function OffreForm() {
 
     try {
       // Realizar solicitud POST al backend
-      const response = await axios.post("http://127.0.0.1:8000/offers", {
+      const response = await axios.post(`${API_IP}/offers`, {
         nom_offert: nomOffert,
         nom_entreprise: nomEntreprise,
         adresse_entreprise: adresseEntreprise,

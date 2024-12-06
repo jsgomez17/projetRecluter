@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { API_IP } from "../config";
 
 function LoginForm({ onLogin }) {
   const [email, setEmail] = useState("");
@@ -10,13 +11,10 @@ function LoginForm({ onLogin }) {
 
     try {
       // Enviar datos al backend
-      const response = await axios.post(
-        "http://127.0.0.1:8000/utilisateurs/login",
-        {
-          email,
-          mot_de_passe: password,
-        }
-      );
+      const response = await axios.post(`${API_IP}/utilisateurs/login`, {
+        email,
+        mot_de_passe: password,
+      });
 
       const { user } = response.data;
       onLogin(user); // Pasar los datos del usuario al estado global en App.js

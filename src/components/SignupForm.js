@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { API_IP } from "../config";
 import axios from "axios";
 import "./SignupForm.css"; // Importar el CSS
 
@@ -41,7 +41,7 @@ function SignupForm() {
 
     try {
       // Enviar datos al backend
-      const response = await axios.post("http://127.0.0.1:8000/utilisateurs", {
+      const response = await axios.post(`${API_IP}/utilisateurs`, {
         nom,
         prenom,
         email,

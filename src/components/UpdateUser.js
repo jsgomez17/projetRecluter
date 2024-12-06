@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import UpdateCV from "./UpdateCV";
-import "./UpdateUser.css"; // Estilos específicos
+import "./UpdateUser.css";
+import { API_IP } from "../config";
 
 function UpdateUser({ userId, isRecruiter }) {
   const navigate = useNavigate();
@@ -28,9 +29,7 @@ function UpdateUser({ userId, isRecruiter }) {
       setLoading(true);
       setError(null);
       try {
-        const response = await axios.get(
-          `http://127.0.0.1:8000/utilisateurs/${userId}`
-        );
+        const response = await axios.get(`${API_IP}/utilisateurs/${userId}`);
         const data = response.data;
 
         // Actualiza los estados con los datos del usuario
@@ -62,7 +61,7 @@ function UpdateUser({ userId, isRecruiter }) {
     }
 
     try {
-      await axios.put(`http://127.0.0.1:8000/utilisateurs/${userId}`, {
+      await axios.put(`${API_IP}/utilisateurs/${userId}`, {
         nom,
         prenom,
         email,

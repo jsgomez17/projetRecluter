@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
-import "./PostulerForm.css"; // Opcional, para estilos personalizados.
+import "./PostulerForm.css";
+import { API_IP } from "../config";
 
 function PostulerForm() {
   const [letter, setLetter] = useState("");
@@ -26,7 +27,7 @@ function PostulerForm() {
     setIsLoading(true);
     try {
       // Lógica para enviar la carta al backend
-      await axios.post("http://127.0.0.1:8000/postulats/postuler", {
+      await axios.post(`${API_IP}/postulats/postuler`, {
         candidat_id: candidat_id,
         offre_id: offre_id,
         lettre: letter,
@@ -49,15 +50,12 @@ function PostulerForm() {
     setIsLoading(true);
     try {
       // Lógica para generar la carta con IA
-      const response = await axios.get(
-        "http://127.0.0.1:8000/postulats/generate-letter",
-        {
-          params: {
-            candidat_id: candidat_id,
-            offre_id: offre_id,
-          },
-        }
-      );
+      const response = await axios.get(`/postulats/generate-letter`, {
+        params: {
+          candidat_id: candidat_id,
+          offre_id: offre_id,
+        },
+      });
       setLetter(response.data.generated_letter); // Establecer la carta generada
     } catch (error) {
       console.error("Erreur lors de la génération de la lettre :", error);

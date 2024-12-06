@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./MyApplications.css";
+import { API_IP } from "../config";
 
 function MyApplications({ user_id }) {
   const [applications, setApplications] = useState([]);
@@ -10,12 +11,9 @@ function MyApplications({ user_id }) {
   useEffect(() => {
     const fetchApplications = async () => {
       try {
-        const response = await axios.get(
-          "http://127.0.0.1:8000/postulats/applications",
-          {
-            params: { candidat_id: user_id },
-          }
-        );
+        const response = await axios.get(`${API_IP}/postulats/applications`, {
+          params: { candidat_id: user_id },
+        });
         setApplications(response.data);
       } catch (err) {
         setError(err);

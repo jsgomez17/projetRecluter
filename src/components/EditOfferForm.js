@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./OffreForm.css";
+import { API_IP } from "../config";
 
 function EditOfferForm() {
   const { offerId } = useParams();
@@ -33,9 +34,7 @@ function EditOfferForm() {
 
       try {
         // Solicitud GET para obtener los detalles de la oferta
-        const response = await axios.get(
-          `http://127.0.0.1:8000/offers/${offerId}`
-        );
+        const response = await axios.get(`${API_IP}/offers/${offerId}`);
         const data = response.data;
 
         // Precargar los campos con los datos obtenidos
@@ -77,7 +76,7 @@ function EditOfferForm() {
 
     try {
       // Solicitud PUT para actualizar la oferta
-      await axios.put(`http://127.0.0.1:8000/offers/${offerId}`, {
+      await axios.put(`${API_IP}/offers/${offerId}`, {
         nom_offert: nomOffert,
         nom_entreprise: nomEntreprise,
         adresse_entreprise: adresseEntreprise,

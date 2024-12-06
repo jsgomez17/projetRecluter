@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import "./Postulants.css";
+import { API_IP } from "../config";
 
 function Postulants({ user_id }) {
   const { offerId } = useParams(); // Obtén el ID de la oferta desde los parámetros de la URL
@@ -19,15 +20,14 @@ function Postulants({ user_id }) {
 
       try {
         // Obtener todos los postulantes
-        const allResponse = await axios.get(
-          "http://127.0.0.1:8000/postulats/postulants",
-          { params: { offre_id: offerId, recommended_only: false } }
-        );
+        const allResponse = await axios.get(`${API_IP}/postulats/postulants`, {
+          params: { offre_id: offerId, recommended_only: false },
+        });
         setAllPostulants(allResponse.data);
 
         // Obtener postulantes recomendados
         const recommendedResponse = await axios.get(
-          "http://127.0.0.1:8000/postulats/postulants",
+          `${API_IP}/postulats/postulants`,
           { params: { offre_id: offerId, recommended_only: true } }
         );
         setRecommendedPostulants(recommendedResponse.data);
@@ -55,7 +55,7 @@ function Postulants({ user_id }) {
 
   const handleDownload = (urlPdf) => {
     const fileName = urlPdf.split("/").pop(); // Extrae el nombre del archivo
-    const downloadUrl = `http://127.0.0.1:8000/cvs/download-cv?file_name=${fileName}`;
+    const downloadUrl = `${API_IP}/cvs/download-cv?file_name=${fileName}`;
     window.open(downloadUrl, "_blank"); // Abre en una nueva pestaña
   };
 
@@ -103,7 +103,12 @@ function Postulants({ user_id }) {
                 <strong>Email:</strong> {postulant.email}
               </p>
               <p>
-                <strong>Lettre:</strong> {postulant.lettre}
+                <strong>Lettre:</strong>
+              </p>
+              <p>
+                <textarea className="postulant-lettre" readOnly>
+                  {postulant.lettre}
+                </textarea>
               </p>
               <button
                 className="action-button"

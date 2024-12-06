@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./TeleverserCVForm.css";
 import axios from "axios";
+import { API_IP } from "../config";
 
 function TeleverserCVForm() {
   const location = useLocation();
@@ -18,7 +19,7 @@ function TeleverserCVForm() {
       formData.append("file", cvFile); // Archivo
       try {
         // Llamada al backend para cargar el CV
-        await axios.post("http://127.0.0.1:8000/cvs/upload-cv", formData, {
+        await axios.post(`${API_IP}/cvs/upload-cv`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
         alert("CV téléchargé avec succès!");

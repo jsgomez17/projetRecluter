@@ -20,7 +20,7 @@ def read_root():
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Cambia según tu dominio en producción
+    allow_origins=["*"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -5,6 +5,7 @@ import axios from "axios";
 import Chatbot from "./Chatbot";
 import "./JobOffers.css";
 import { FaEdit, FaTrash } from "react-icons/fa";
+import { API_IP } from "../config";
 
 function JobOffers({ profil_id, user_id, plan_id }) {
   const { hasCV, loading, error } = useCheckCV(user_id);
@@ -25,7 +26,7 @@ function JobOffers({ profil_id, user_id, plan_id }) {
     // Cargar las ofertas desde el backend
     const fetchOffers = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/offers", {
+        const response = await axios.get(`${API_IP}/offers/`, {
           params: { profil_id, user_id },
         });
         setOffers(response.data);
@@ -42,10 +43,9 @@ function JobOffers({ profil_id, user_id, plan_id }) {
     // Cargar ofertas recomendadas desde el backend
     const fetchRecommendedOffers = async () => {
       try {
-        const response = await axios.get(
-          "http://127.0.0.1:8000/offers/recommended",
-          { params: { user_id } }
-        );
+        const response = await axios.get(`${API_IP}/offers/recommended`, {
+          params: { user_id },
+        });
         setRecommendedOffers(response.data);
       } catch (error) {
         console.error(
@@ -100,7 +100,7 @@ function JobOffers({ profil_id, user_id, plan_id }) {
     if (!confirmDelete) return;
 
     try {
-      await axios.delete(`http://127.0.0.1:8000/offers/${offerId}`);
+      await axios.delete(`${API_IP}/offers/${offerId}`);
       alert("Offre supprimée avec succès.");
       // Filtrar las ofertas para eliminar la oferta eliminada
       setOffers((prevOffers) =>

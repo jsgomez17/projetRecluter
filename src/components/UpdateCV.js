@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
-import "./UpdateUser.css"; // Asegúrate de tener un archivo CSS para estilos.
+import "./UpdateUser.css";
+import { API_IP } from "../config";
 
 function UpdateCV({ userId, isRecruiter }) {
   const [file, setFile] = useState(null);
@@ -32,15 +33,11 @@ function UpdateCV({ userId, isRecruiter }) {
       setUploading(true);
       setMessage("");
 
-      const response = await axios.post(
-        "http://127.0.0.1:8000/cvs/update-cv",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const response = await axios.post(`${API_IP}/cvs/update-cv`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
       setMessage(response.data.message);
     } catch (error) {

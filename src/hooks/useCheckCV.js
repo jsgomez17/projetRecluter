@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { API_IP } from "../config";
 
 function useCheckCV(userId) {
   const [hasCV, setHasCV] = useState(null); // `null` indica que no se ha verificado aún
@@ -10,7 +11,7 @@ function useCheckCV(userId) {
     const checkCV = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://127.0.0.1:8000/cvs/check_cv`, {
+        const response = await axios.get(`${API_IP}/cvs/check_cv`, {
           params: { utilisateur_id: userId },
         });
         setHasCV(response.data.has_cv);

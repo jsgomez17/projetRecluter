@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./Chatbot.css";
 import axios from "axios";
+import { API_IP } from "../config";
 
 function Chatbot({ profil_id, user_id, plan_id }) {
   const [isOpen, setIsOpen] = useState(false); // Estado para mostrar u ocultar el chatbot
@@ -22,11 +23,11 @@ function Chatbot({ profil_id, user_id, plan_id }) {
       const isCandidat = profil_id === 2;
       var response = null;
       if (isCandidat) {
-        response = await axios.get("http://127.0.0.1:8000/chat/candidat", {
+        response = await axios.get(`${API_IP}/chat/candidat`, {
           params: { candidat_id: user_id, question: userMessage },
         });
       } else {
-        response = await axios.get("http://127.0.0.1:8000/chat/recruiter", {
+        response = await axios.get(`${API_IP}/chat/recruiter`, {
           params: { recruiter_id: user_id, question: userMessage },
         });
       }

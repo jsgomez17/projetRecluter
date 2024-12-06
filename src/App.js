@@ -33,7 +33,7 @@ function App() {
     setUser(null);
     localStorage.removeItem("authToken");
     localStorage.removeItem("user");
-    navigate("/"); // Redirigir a la página de inicio después del logout
+    navigate("/");
   };
 
   return (
